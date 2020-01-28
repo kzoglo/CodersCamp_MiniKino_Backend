@@ -1,3 +1,6 @@
-# CC5_Cinema_backend
+# CodersCamp_MiniKino_Backend
 
-# Server ustawiony został na port 3001, żeby nie konfliktował się z React'em
+Backend application, which was deployed on heroku. Made for CodersCamp_MiniKino_Frontend client application. Project has been made for a Coders Camp course.
+
+- users, models' schemas, authentication - Michał Skorzec,
+- models' joi validation, routes (movies, reservation, rooms, screening, seats), deploy - Kamil Żogło
