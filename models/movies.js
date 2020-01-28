@@ -42,8 +42,7 @@ function validateMovie(movie) {
     genre: Joi.string()
       .min(1)
       .max(128),
-    description: Joi.string()
-      .min(8),
+    description: Joi.string().min(8),
     imageUrl: Joi.string().min(1)
   };
 
