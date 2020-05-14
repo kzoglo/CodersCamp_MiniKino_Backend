@@ -1,38 +1,52 @@
-const Joi = require('joi');
-Joi.objectId = require('joi-objectid')(Joi);
 const mongoose = require('mongoose');
+const Joi = require('@hapi/joi');
+Joi.objectId = require('joi-objectid')(Joi);
 
-/****** SCHEMA and MODEL ******/
-const Screening = mongoose.model(
-  'Screening',
-  new mongoose.Schema({
-    movie_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Movie',
-      required: true
-    },
-    room_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Room',
-      required: true
-    },
-    time: {
-      type: Date,
-      required: true
-    }
-  })
-);
+const { Movie } = require('./movie');
+const { Room } = require('./room');
+const {
+  validateId,
+  validationMsg,
+} = require('../assistive_functions/validateId');
 
-/****** JOI validation ******/
+/*** Schema and Model ***/
+const screeningSchema = new mongoose.Schema({
+  movie_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    validate: [
+      async (value) => await validateId(value, Movie),
+      validationMsg(Movie),
+    ],
+    ref: 'Movie',
+    required: true,
+  },
+  room_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    validate: [
+      async (value) => await validateId(value, Room),
+      validationMsg(Room),
+    ],
+    ref: 'Room',
+    required: true,
+  },
+  time: {
+    type: Date,
+    required: true,
+  },
+});
+const Screening = mongoose.model('Screening', screeningSchema);
+Screening.modelName = 'Screening';
+
+/*** JOI Validation ***/
 function validateScreening(screening) {
-  const schema = {
+  const screeningJoiSchema = Joi.object({
     movie_id: Joi.objectId().required(),
     room_id: Joi.objectId().required(),
-    time: Joi.date().required()
-  };
+    time: Joi.date().required(),
+  });
 
-  return Joi.validate(screening, schema);
+  return screeningJoiSchema.validate(screening);
 }
 
-module.exports.validate = validateScreening;
+module.exports.joiValidate = validateScreening;
 module.exports.Screening = Screening;
