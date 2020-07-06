@@ -20,7 +20,7 @@ module.exports.postUser = async ({ body }, res, next) => {
     } = joiValidation(joiValidate, body);
 
     if (isInequal(password, confirmPassword)) {
-      handleErrors('Password needs to be identical', 422);
+      handleErrors('Password needs to be identical.', 422);
     }
 
     await checkForExistingDoc({ email }, User);

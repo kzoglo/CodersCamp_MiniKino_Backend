@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
+/*** Variables ***/
+const tokenExpiresIn = 3600000;
+
 /*** Schema and Model ***/
 const userSchema = new mongoose.Schema({
   name: {
@@ -50,7 +53,7 @@ userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     { email: this.email, _id: this._id.toString(), admin: this.admin },
     config.get('jwtPrivateKey'),
-    { expiresIn: '3000000ms' }
+    { expiresIn: `${tokenExpiresIn}ms` }
   );
   return token;
 };
@@ -76,5 +79,6 @@ function validateUser(user) {
   return userJoiSchema.validate(user);
 }
 
+exports.tokenExpiresIn = tokenExpiresIn;
 exports.User = User;
 exports.joiValidate = validateUser;

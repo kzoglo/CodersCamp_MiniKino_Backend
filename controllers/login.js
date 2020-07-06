@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const Joi = require('@hapi/joi');
 
-const { User } = require('../models/user');
+const { User, tokenExpiresIn } = require('../models/user');
 const handleErrors = require('../assistive_functions/handleErrors');
 const joiValidation = require('../assistive_functions/joiValidation');
 
@@ -25,6 +25,7 @@ module.exports.login = async ({ body }, res, next) => {
     const { _id, name, surname, password: encryptedPass } = user;
 
     const validPassword = await bcrypt.compare(password, encryptedPass);
+
     if (!validPassword) handleErrors('Invalid password.', 401);
 
     const token = user.generateAuthToken();
@@ -34,7 +35,7 @@ module.exports.login = async ({ body }, res, next) => {
       userId: _id.toString(),
       userName: name,
       userSurname: surname,
-      expiresIn: 3000000,
+      expiresIn: tokenExpiresIn,
     });
   } catch (err) {
     next(err);
