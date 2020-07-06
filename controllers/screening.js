@@ -5,12 +5,14 @@ const handleErrors = require('../assistive_functions/handleErrors');
 const presaveValidationHandler = require('../assistive_functions/presaveValidationHandler');
 const joiValidation = require('../assistive_functions/joiValidation');
 const checkForExistingDoc = require('../assistive_functions/checkForExistingDoc');
+const { isEqual } = require('../predicates');
 
 /*** Screening Handlers ***/
 module.exports.getScreenings = async (req, res, next) => {
   try {
     const screenings = await Screening.find();
-    if (!screenings) handleErrors('Screening not found!', 404);
+    if (isEqual(screenings.length, 0))
+      handleErrors('No screenings found!', 404);
     res.status(200).json(screenings);
   } catch (err) {
     next(err);

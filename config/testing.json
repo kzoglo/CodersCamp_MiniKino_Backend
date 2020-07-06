@@ -1,6 +1,6 @@
 {
   "db": {
-    "dbName": "CC5_Cinema",
+    "dbName": "CC5_Cinema_tests",
     "portNb": 27017,
     "host": "localhost"
   }

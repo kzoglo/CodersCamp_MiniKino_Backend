@@ -3,12 +3,13 @@ const handleErrors = require('../assistive_functions/handleErrors');
 const presaveValidationHandler = require('../assistive_functions/presaveValidationHandler');
 const joiValidation = require('../assistive_functions/joiValidation');
 const checkForExistingDoc = require('../assistive_functions/checkForExistingDoc');
+const { isEqual } = require('../predicates');
 
 /*** Movies Handlers ***/
 module.exports.getMovies = async (req, res, next) => {
   try {
     const movies = await Movie.find();
-    if (!movies) {
+    if (isEqual(movies.length, 0)) {
       handleErrors('No movies found.', 404);
     }
 
