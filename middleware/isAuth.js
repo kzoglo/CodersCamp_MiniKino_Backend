@@ -1,12 +1,16 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
+const handleErrors = require('../assistive_functions/handleErrors');
+
 const isAuth = (req, res, next) => {
+  if (req.body.hasOwnProperty('email') && !req.body.hasOwnProperty('admin'))
+    return next();
   const authHeader = req.get('Authorization');
-  if (!authHeader) {
-    const error = new Error('Could not authenticate!');
-    error.statusCode = 401;
-    throw error;
+  try {
+    if (!authHeader) handleErrors('Could not authenticate!', 401);
+  } catch (err) {
+    return next(err);
   }
 
   const authToken = authHeader.split(' ')[1];
@@ -14,8 +18,8 @@ const isAuth = (req, res, next) => {
   try {
     decodedToken = jwt.verify(authToken, config.get('jwtPrivateKey'));
   } catch (err) {
-    err.statusCode = 500;
-    throw err;
+    if (!err.statusCode) err.statusCode = 401;
+    return next(err);
   }
 
   req.user_id = decodedToken._id;

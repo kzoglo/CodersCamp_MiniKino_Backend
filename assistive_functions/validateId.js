@@ -1,5 +1,5 @@
-const validateId = async (value, model) => {
-  const foundDoc = await model.findById(value);
+const validateId = async (id, model) => {
+  const foundDoc = await model.findById(id);
   if (!foundDoc) return false;
   return true;
 };
@@ -7,5 +7,7 @@ const validateId = async (value, model) => {
 const validationMsg = (model) =>
   `Given ${model.modelName.toLowerCase()}_id does not exist in DB.`;
 
-module.exports.validateId = validateId;
-module.exports.validationMsg = validationMsg;
+module.exports = {
+  validateId,
+  validationMsg,
+};

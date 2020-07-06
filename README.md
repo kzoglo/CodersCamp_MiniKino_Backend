@@ -12,6 +12,7 @@
   <a href="https://github.com/kzoglo/CodersCamp_MiniKino_Backend/blob/master/LICENSE" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-yellow.svg" />
   </a>
+  <img alt="Coverage: 99.34%" src="https://img.shields.io/badge/license-MIT-green.svg" />
 </p>
 
 > Written in NodeJS REST API for the CodersCamp_MiniKino_Frontend project. It serves user creation, logging system, tickets reservations and admin routes, like movies creation. Server is connected with MongoDB. It uses expressJS and mongoose.
@@ -33,6 +34,12 @@ npm install
 
 ```sh
 npm run start
+```
+
+## Run tests
+
+```sh
+npm test
 ```
 
 ## Author
