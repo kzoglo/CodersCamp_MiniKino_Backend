@@ -1,4 +1,4 @@
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const config = require('config');
@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: 3,
     maxlength: 255,
+    match: /^[A-Ż]?[a-ż]*$/,
     required: true,
   },
   surname: {
@@ -20,6 +21,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: 3,
     maxlength: 255,
+    match: /(^[A-Za-ż][']?[A-Z]?[a-ż]+[-|\s]?[A-Za-ż]+$)/,
     required: true,
   },
   email: {
@@ -27,6 +29,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     lowercase: true,
     max: 255,
+    match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
     unique: true,
     required: true,
   },
@@ -64,13 +67,23 @@ User.modelName = 'User';
 /*** JOI Validation ***/
 function validateUser(user) {
   const userJoiSchema = Joi.object({
-    name: Joi.string().trim().min(3).max(255).required(),
-    surname: Joi.string().trim().min(3).max(255).required(),
+    name: Joi.string()
+      .trim()
+      .min(3)
+      .max(255)
+      .pattern(/^[A-Ż]?[a-ż]*$/)
+      .required(),
+    surname: Joi.string()
+      .trim()
+      .min(3)
+      .max(255)
+      .pattern(/(^[A-Za-ż][']?[A-Z]?[a-ż]+[-|\s]?[A-Za-ż]+$)/)
+      .required(),
     email: Joi.string()
       .lowercase()
       .max(255)
       .required()
-      .email({ tlds: { allow: false } }),
+      .email({ tlds: { allow: true } }),
     password: Joi.string().trim().min(8).max(255).required(),
     confirmPassword: Joi.string().trim().min(8).max(255),
     admin: Joi.boolean().default(false),
