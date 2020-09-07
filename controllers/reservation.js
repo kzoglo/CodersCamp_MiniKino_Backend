@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const { isEqual, isInequal } = require('../predicates');
+const { isEqual } = require('../predicates');
 const { Reservation, joiValidate } = require('../models/reservation');
 const handleErrors = require('../assistive_functions/handleErrors');
 const presaveValidationHandler = require('../assistive_functions/presaveValidationHandler');
@@ -56,7 +56,7 @@ module.exports.postReservation = async (
   try {
     const { user_id, seat_id, screening_id } = joiValidation(joiValidate, body);
 
-    if (isInequal(decodedUserId, user_id))
+    if (!isEqual(decodedUserId, user_id))
       handleErrors('You do not have access to the requested resource.', 403);
 
     await checkForExistingDoc(

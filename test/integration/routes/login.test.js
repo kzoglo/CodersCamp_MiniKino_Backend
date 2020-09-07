@@ -28,8 +28,8 @@ describe('/api/login', () => {
           confirmPassword: 'kamilkamil',
         },
         {
-          name: 'kamil2',
-          surname: 'kamil2',
+          name: 'kamil',
+          surname: 'kamil',
           email: 'user2@test.pl',
           password: 'kamilkamil',
           confirmPassword: 'kamilkamil',
