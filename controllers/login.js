@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 
 const { User, tokenExpiresIn } = require('../models/user');
 const handleErrors = require('../assistive_functions/handleErrors');

@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-const { isInequal } = require('../predicates');
+const { isEqual } = require('../predicates');
 const { User, joiValidate } = require('../models/user');
 const handleErrors = require('../assistive_functions/handleErrors');
 const presaveValidationHandler = require('../assistive_functions/presaveValidationHandler');
@@ -19,7 +19,7 @@ module.exports.postUser = async ({ body }, res, next) => {
       admin,
     } = joiValidation(joiValidate, body);
 
-    if (isInequal(password, confirmPassword)) {
+    if (!isEqual(password, confirmPassword)) {
       handleErrors('Password needs to be identical.', 422);
     }
 
