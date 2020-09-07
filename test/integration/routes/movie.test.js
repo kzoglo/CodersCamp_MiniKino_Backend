@@ -11,6 +11,21 @@ const config = require('config');
 const { Movie } = require('../../../models/movie');
 
 describe('/api/movie', () => {
+  const moviePostersNames = {
+    alladyn: 'alladyn',
+    avengers: 'avengers',
+    gemini_man: 'gemini_man',
+    it_2: 'it_2',
+    jak_wytresowac_smoka_3: 'jak_wytresowac_smoka_3',
+    joker: 'joker',
+    jumanji: 'jumanji',
+    kapitan_marvel: 'kapitan_marvel',
+    kraina_lodu_2: 'kraina_lodu_2',
+    pewnego_razu_w_hollywood: 'pewnego_razu_w_hollywood',
+    slimaczki: 'slimaczki',
+    split: 'split',
+    star_wars: 'star_wars',
+  };
   let server;
   let moviesDocs;
   let token = jwt.sign({ admin: true }, config.get('jwtPrivateKey'));
@@ -24,6 +39,13 @@ describe('/api/movie', () => {
   });
 
   beforeEach(async () => {
+    const {
+      jumanji,
+      pewnego_razu_w_hollywood,
+      split,
+      gemini_man,
+    } = moviePostersNames;
+
     moviesDocs = [
       {
         _id: '012345678901234567891234',
@@ -31,7 +53,7 @@ describe('/api/movie', () => {
         year: 2000,
         genre: 'comedy',
         description: 'Funny movie about dogs.',
-        imageUrl: 'images/movies/zdj14.jpg',
+        imageUrl: `images/movies/${jumanji}.jpg`,
         __v: 0,
       },
       {
@@ -40,7 +62,7 @@ describe('/api/movie', () => {
         year: 1980,
         genre: 'thriller',
         description: 'Scary piece of cinematography.',
-        imageUrl: 'images/movies/zdj10.jpg',
+        imageUrl: `images/movies/${pewnego_razu_w_hollywood}.jpg`,
         __v: 0,
       },
       {
@@ -49,7 +71,7 @@ describe('/api/movie', () => {
         year: 2020,
         genre: 'drama',
         description: 'Heartbreaking movie about longing for a pack of pigs.',
-        imageUrl: 'images/movies/zdj9.jpg',
+        imageUrl: `images/movies/${split}.jpg`,
         __v: 0,
       },
       {
@@ -58,7 +80,7 @@ describe('/api/movie', () => {
         year: 2010,
         genre: 'sci-fi',
         description: 'Movie about little critters.',
-        imageUrl: 'images/movies/zdj3.jpg',
+        imageUrl: `images/movies/${gemini_man}.jpg`,
         __v: 0,
       },
     ];
