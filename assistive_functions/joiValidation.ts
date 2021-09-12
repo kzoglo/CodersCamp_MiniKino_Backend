@@ -1,10 +1,11 @@
-const handleErrors = require('./handleErrors');
+//TODO - awaiting its removal 
+// const handleErrors = require('./handleErrors');
 
-export const joiValidation = (joiValidate, dataToValidate) => {
-  const { error, value } = joiValidate(dataToValidate);
-  if (error) handleErrors(error.details[0].message, 422);
+// export const joiValidation = (joiValidate, dataToValidate) => {
+//   const { error, value } = joiValidate(dataToValidate);
+//   if (error) handleErrors(error.details[0].message, 422);
 
-  return value;
-};
+//   return value;
+// };
 
-// module.exports = joiValidation;
+// // module.exports = joiValidation;

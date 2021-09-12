@@ -1,7 +1,6 @@
-export const handleErrors = (message = 'Server Error', status = 500) => {
-  const error = new Error(message);
-  error.statusCode = status;
+import { ServerError } from '../tools/errors/Errors';
+
+export const handleErrors = (message?: string, status?: number) => {
+  const error = new ServerError(status, message);
   throw error;
 };
-
-// module.exports = handleErrors;

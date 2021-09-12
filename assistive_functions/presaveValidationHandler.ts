@@ -1,11 +1,12 @@
-const { isEqual } = require('../predicates');
+import { NextFunction } from 'express';
 
-export const presaveValidationHandler = (err, next) => {
+import { isEqual } from '../tools/predicates';
+import { ServerError } from '../tools/errors/Errors';
+
+export const presaveValidationHandler = (err: ServerError, next: NextFunction) => {
   if (isEqual(err.name, 'ValidationError')) {
-    err.statusCode = 422;
+    err.status = 422;
   }
 
   next(err);
 };
-
-// module.exports = presaveValidationHandler;
