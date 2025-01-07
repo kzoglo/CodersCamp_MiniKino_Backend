@@ -2,7 +2,7 @@
   "jwtPrivateKey": "CINEMA_JWT_PRIVATE_KEY",
   "db": {
     "dbName": "MONGO_DEF_DB",
-    "host": "MONGO_USER",
+    "dbHost": "MONGO_USER",
     "password": "MONGO_PASS"
   }
 }

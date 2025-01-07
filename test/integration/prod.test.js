@@ -21,8 +21,8 @@ describe('prod', () => {
     });
     configStub = sinon.stub(config, 'get').returns({
       dbName: 'productionDB',
-      portNb: '',
-      host: '',
+      dbPort: '',
+      dbHost: '',
       password: '',
     });
 

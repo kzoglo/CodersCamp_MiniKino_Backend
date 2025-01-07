@@ -10,14 +10,8 @@ const checkForExistingDoc = require('../assistive_functions/checkForExistingDoc'
 /*** User Handlers ***/
 module.exports.postUser = async ({ body }, res, next) => {
   try {
-    const {
-      name,
-      surname,
-      email,
-      password,
-      confirmPassword,
-      admin,
-    } = joiValidation(joiValidate, body);
+    const { name, surname, email, password, confirmPassword, admin } =
+      joiValidation(joiValidate, body);
 
     if (!isEqual(password, confirmPassword)) {
       handleErrors('Password needs to be identical.', 422);
