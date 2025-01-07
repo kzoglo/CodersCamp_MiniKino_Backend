@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const config = require('config');
-const { dbName, portNb, host, password } = config.get('db');
+const { dbName, dbPort, dbHost, password } = config.get('db');
 const app = express();
 
 const user = require('./routes/user');
@@ -49,11 +49,15 @@ if (isEqual(process.env.NODE_ENV, 'production')) require('./startup/prod')(app);
 
 const dbUri = (() => {
   const nodeEnv = process.env.NODE_ENV;
-  if (!nodeEnv) return `mongodb://${host}:${portNb}/${dbName}`;
-  else if (isEqual(nodeEnv, 'testing'))
-    return `mongodb://${host}:${portNb}/${dbName}`;
-  else if (isEqual(nodeEnv, 'production'))
-    return `mongodb+srv://${host}:${password}@cinemadb-20fmo.mongodb.net/${dbName}`;
+  // TODO - pierwszy i drugi case sa takie same imo
+  if (!nodeEnv) {
+    return `mongodb://${dbHost}:${dbPort}/${dbName}`;
+  } else if (isEqual(nodeEnv, 'testing')) {
+    return `mongodb://${dbHost}:${dbPort}/${dbName}`;
+  } else if (isEqual(nodeEnv, 'production')) {
+    // TODO - tu bedzie do zmiany
+    return `mongodb+srv://${dbHost}:${password}@cinemadb-20fmo.mongodb.net/${dbName}`;
+  }
 })();
 
 const port = process.env.PORT || 3001;
@@ -61,11 +65,7 @@ const server = app.listen(port, () => {
   console.log(`Listening on port ${port}...`);
 
   mongoose
-    .connect(dbUri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    })
+    .connect(dbUri)
     .then(() => {
       console.log(`Connected to ${dbName}...`);
     })

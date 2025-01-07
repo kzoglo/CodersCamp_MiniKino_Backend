@@ -39,12 +39,8 @@ describe('/api/movie', () => {
   });
 
   beforeEach(async () => {
-    const {
-      jumanji,
-      pewnego_razu_w_hollywood,
-      split,
-      gemini_man,
-    } = moviePostersNames;
+    const { jumanji, pewnego_razu_w_hollywood, split, gemini_man } =
+      moviePostersNames;
 
     moviesDocs = [
       {

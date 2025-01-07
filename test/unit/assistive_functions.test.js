@@ -11,8 +11,8 @@ const { User } = require('../../models/user');
 const joiValidation = require('../../assistive_functions/joiValidation');
 const presaveValidationHandler = require('../../assistive_functions/presaveValidationHandler');
 let validateId = require('../../assistive_functions/validateId').validateId;
-let validationMsg = require('../../assistive_functions/validateId')
-  .validationMsg;
+let validationMsg =
+  require('../../assistive_functions/validateId').validationMsg;
 
 describe('Assistive Functions', () => {
   /*** handleErrors ***/
@@ -150,8 +150,8 @@ describe('Assistive Functions', () => {
 
       before(() => {
         validateId = require('../../assistive_functions/validateId').validateId;
-        validationMsg = require('../../assistive_functions/validateId')
-          .validationMsg;
+        validationMsg =
+          require('../../assistive_functions/validateId').validationMsg;
       });
 
       it('should return true, if a given record was found', () => {
