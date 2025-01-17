@@ -41,7 +41,7 @@
     "joi-objectid": "^4.0.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.7.0",
-    "mongoose": "^8.4.0",
+    "mongoose": "^8.9.5",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
