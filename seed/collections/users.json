@@ -1,13 +1,11 @@
 [
   {
-    "_id": {
-      "$oid": "67587c3b2769bdf09665855a"
-    },
+    "_id": "67587c3b2769bdf09665855a",
     "name": "Kamil",
     "surname": "Kamil",
     "email": "kamilek1@wp.pl",
     "password": "$2a$10$05XtqdwnYq7ph4jRhgitMemo5qOTwshXK1wdhZ0taH5W8Sq.nefZG",
     "admin": false,
-    "__v": 0
+    "version": 0
   }
 ]

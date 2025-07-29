@@ -1,7 +1,7 @@
 [
   {
-    "_id": { "$oid": "5ea7da1a5dacb119b8a75eb9" },
-    "name": { "$numberInt": "10" },
-    "__v": { "$numberInt": "0" }
+    "_id": "5ea7da1a5dacb119b8a75eb9",
+    "name": 10,
+    "__v": 0
   }
 ]
