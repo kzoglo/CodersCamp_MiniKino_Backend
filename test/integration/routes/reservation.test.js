@@ -7,9 +7,15 @@ const expect = chai.expect;
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const mongoose = require('mongoose');
+const initializeDatabase = require('../../../seed/seed');
+const { initializeMinIO } = require('../../../bucket/minio');
+const { Seat } = require('../../../models/seat');
+const { Room } = require('../../../models/room');
+const { Movie } = require('../../../models/movie');
+const { Screening } = require('../../../models/screening');
 
 describe('/api/reservation', () => {
-  let server, reservations, user_id, screening_id;
+  let app, reservations, user_id, screening_id, seat_id2;
   let token;
 
   require.cache[require.resolve('../../../assistive_functions/validateId')] = {
@@ -21,46 +27,91 @@ describe('/api/reservation', () => {
   delete mongoose.models['Reservation'];
   const { Reservation } = require('../../../models/reservation');
 
-  before(() => {
-    server = require('../../../index');
+  before(async () => {
+    app = require('../../../index');
+    await initializeDatabase();
+    await initializeMinIO();
   });
 
   after(() => {
-    server.close();
     delete require.cache[
       require.resolve('../../../assistive_functions/validateId')
     ];
   });
 
   beforeEach(async () => {
-    reservations = (() => {
-      const res = [];
-      for (let i = 0; i < 3; i++) {
-        res.push({
-          _id: `${i + 1}12345${i}81901213${i}5678912${i}`,
-          user_id: `${i + 1}12345${i}8190121345678912${i}`,
-          seat_id: `${i + 2}123456789101234567891${i}${i + 1}`,
-          screening_id: `${i}${i}345678901231456789123${i + 2}`,
-        });
-      }
-      return res;
-    })();
-    screening_id = reservations[0].screening_id;
-    user_id = reservations[0].user_id;
+    await Room.deleteMany({});
+    await Movie.deleteMany({});
+    await Seat.deleteMany({});
+    await Screening.deleteMany({});
+    await Reservation.deleteMany({});
+
+    const seat_id = '012345678901234567894322';
+    seat_id2 = '012345678901234567894999';
+    const movie_id = '012345678901234567894321';
+    const room_id = '112345678901234567891234';
+    const reservation_id = '112345678901234567891444';
+    screening_id = '012345678901231567194321';
+    user_id = require('../../../seed/collections/users.json')[0]._id.toString();
+
+    const seats = [
+      {
+        _id: seat_id,
+        room_id,
+        row: 1,
+        seatNumber: 1,
+      },
+      {
+        _id: seat_id2,
+        room_id,
+        row: 1,
+        seatNumber: 2,
+      },
+    ];
+    const rooms = [{ _id: room_id, name: 1 }];
+    const movies = [
+      {
+        _id: movie_id,
+        title: 'Test Movie',
+        year: 2019,
+        genre: 'komedia',
+        description: 'Testowy opis filmu.',
+        imageUrl: 'jumanji.jpg',
+        __v: 0,
+      },
+    ];
+    const screenings = [
+      {
+        _id: screening_id,
+        movie_id,
+        room_id,
+        time: 1830297600000,
+        __v: 0,
+      },
+    ];
+    await Room.insertMany(rooms);
+    await Movie.insertMany(movies);
+    await Seat.insertMany(seats);
+    await Screening.insertMany(screenings);
+
+    reservations = [
+      {
+        _id: reservation_id,
+        user_id,
+        seat_id,
+        screening_id,
+      },
+    ];
+
     token = jwt.sign({ _id: user_id }, config.get('jwtPrivateKey'));
 
     await Reservation.insertMany(reservations);
   });
 
-  afterEach(async () => {
-    await Reservation.deleteMany({});
-    server.close();
-  });
-
   /*** 'GET /:user_id/:screening_id' ***/
   describe('GET /:user_id/:screening_id', () => {
     it('should return response with "statusCode" 200 and json object with found reservations, if both parameters set in request are valid', async () => {
-      await request(server)
+      await request(app)
         .get(`/api/reservation/${user_id}/${screening_id}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -73,7 +124,7 @@ describe('/api/reservation', () => {
     });
 
     it('should return response with "statusCode" 200 and json object with found reservations, if only valid parameter set in request is "screening_id"', async () => {
-      await request(server)
+      await request(app)
         .get(`/api/reservation/dummy/${screening_id}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -86,7 +137,7 @@ describe('/api/reservation', () => {
     });
 
     it('should return response with "statusCode" 200 and json object with found reservations, if only valid parameter set in request is "user_id"', async () => {
-      await request(server)
+      await request(app)
         .get(`/api/reservation/${user_id}/dummy`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -104,7 +155,7 @@ describe('/api/reservation', () => {
         config.get('jwtPrivateKey')
       );
 
-      await request(server)
+      await request(app)
         .get(`/api/reservation/${user_id}/${screening_id}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -121,7 +172,7 @@ describe('/api/reservation', () => {
       err.statusCode = 500;
       sinon.stub(mongoose.Model, 'find').throws(err);
 
-      await request(server)
+      await request(app)
         .get(`/api/reservation/${user_id}/${screening_id}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -135,19 +186,18 @@ describe('/api/reservation', () => {
 
   /*** 'POST /' ***/
   describe('POST /', () => {
-    let user_id = '112345081901213456789120';
     let reservation;
 
     beforeEach(() => {
       reservation = {
         user_id,
-        seat_id: '512345678910123456789191',
-        screening_id: '993456789012314567891235',
+        seat_id: seat_id2,
+        screening_id,
       };
     });
 
     it('should return response with "statusCode" 201 and json object with "message" prop - "Successful reservation.", if reservation has been properly saved in database', async () => {
-      await request(server)
+      await request(app)
         .post('/api/reservation')
         .send(reservation)
         .set('Content-Type', 'application/json')
@@ -159,7 +209,7 @@ describe('/api/reservation', () => {
     });
 
     it('should return response with "statusCode" 401 and json object with "message" prop - "Could not authenticate!", if "Authorization" header is not present', async () => {
-      await request(server)
+      await request(app)
         .post('/api/reservation')
         .send(reservation)
         .set('Content-Type', 'application/json')
@@ -172,7 +222,7 @@ describe('/api/reservation', () => {
     it('should return response with "statusCode" 401 and json object with "message" prop - "jwt must be provided", if JWT is not present', async () => {
       token = '';
 
-      await request(server)
+      await request(app)
         .post('/api/reservation')
         .send(reservation)
         .set('Content-Type', 'application/json')
@@ -186,7 +236,7 @@ describe('/api/reservation', () => {
     it('should return response with "statusCode" 401 and json object with "message" prop - "jwt malformed", if JWT is not valid', async () => {
       token = 'invalid';
 
-      await request(server)
+      await request(app)
         .post('/api/reservation')
         .send(reservation)
         .set('Content-Type', 'application/json')
@@ -204,7 +254,7 @@ describe('/api/reservation', () => {
         screening_id: '993456789012314567891235',
       };
 
-      await request(server)
+      await request(app)
         .post('/api/reservation')
         .send(reservation)
         .set('Content-Type', 'application/json')
@@ -220,7 +270,7 @@ describe('/api/reservation', () => {
     it('should call "presaveValidationHandler" with error code 403 and eventually return response with the same status and "message" - "You do not have access to the requested resource.", if "user_id" from req.body not match "user_id" parameter decoded previously from JWT', async () => {
       reservation.user_id = '112345088901613456789120';
 
-      await request(server)
+      await request(app)
         .post('/api/reservation')
         .send(reservation)
         .set('Content-Type', 'application/json')
@@ -237,7 +287,7 @@ describe('/api/reservation', () => {
       reservation = reservations[0];
       delete reservation._id;
 
-      await request(server)
+      await request(app)
         .post('/api/reservation')
         .send(reservation)
         .set('Content-Type', 'application/json')
@@ -253,7 +303,7 @@ describe('/api/reservation', () => {
       err.statusCode = 500;
       sinon.stub(mongoose.Model.prototype, 'save').throws(err);
 
-      await request(server)
+      await request(app)
         .post('/api/reservation')
         .send(reservation)
         .set('Content-Type', 'application/json')

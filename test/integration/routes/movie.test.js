@@ -9,6 +9,8 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 
 const { Movie } = require('../../../models/movie');
+const initializeDatabase = require('../../../seed/seed');
+const { initializeMinIO } = require('../../../bucket/minio');
 
 describe('/api/movie', () => {
   const moviePostersNames = {
@@ -26,19 +28,20 @@ describe('/api/movie', () => {
     split: 'split',
     star_wars: 'star_wars',
   };
-  let server;
+  let app;
   let moviesDocs;
   let token = jwt.sign({ admin: true }, config.get('jwtPrivateKey'));
 
-  before(() => {
-    server = require('../../../index');
-  });
+  before(async () => {
+    app = require('../../../index');
 
-  after(() => {
-    server.close();
+    await initializeDatabase();
+    await initializeMinIO();
   });
 
   beforeEach(async () => {
+    await Movie.deleteMany({});
+
     const { jumanji, pewnego_razu_w_hollywood, split, gemini_man } =
       moviePostersNames;
 
@@ -49,7 +52,7 @@ describe('/api/movie', () => {
         year: 2000,
         genre: 'comedy',
         description: 'Funny movie about dogs.',
-        imageUrl: `images/movies/${jumanji}.jpg`,
+        imageUrl: `${jumanji}.jpg`,
         __v: 0,
       },
       {
@@ -58,7 +61,7 @@ describe('/api/movie', () => {
         year: 1980,
         genre: 'thriller',
         description: 'Scary piece of cinematography.',
-        imageUrl: `images/movies/${pewnego_razu_w_hollywood}.jpg`,
+        imageUrl: `${pewnego_razu_w_hollywood}.jpg`,
         __v: 0,
       },
       {
@@ -67,7 +70,7 @@ describe('/api/movie', () => {
         year: 2020,
         genre: 'drama',
         description: 'Heartbreaking movie about longing for a pack of pigs.',
-        imageUrl: `images/movies/${split}.jpg`,
+        imageUrl: `${split}.jpg`,
         __v: 0,
       },
       {
@@ -76,21 +79,17 @@ describe('/api/movie', () => {
         year: 2010,
         genre: 'sci-fi',
         description: 'Movie about little critters.',
-        imageUrl: `images/movies/${gemini_man}.jpg`,
+        imageUrl: `${gemini_man}.jpg`,
         __v: 0,
       },
     ];
     await Movie.insertMany(moviesDocs);
   });
 
-  afterEach(async () => {
-    await Movie.deleteMany({});
-  });
-
   /*** 'GET /' ***/
   describe('GET /', () => {
     it('should return response with status code of 200 and all available movies', async () => {
-      await request(server)
+      await request(app)
         .get('/api/movie')
         .set('Content-Type', 'application/json')
         .expect(200, moviesDocs);
@@ -99,7 +98,7 @@ describe('/api/movie', () => {
     it('should call "next" middleware with an error obj as an argument, "next" will call error handling middleware which will return response with status 404 and message "No movies found."', async () => {
       await Movie.deleteMany({});
 
-      await request(server)
+      await request(app)
         .get('/api/movie')
         .set('Content-Type', 'application/json')
         .expect(404)
@@ -111,8 +110,8 @@ describe('/api/movie', () => {
 
   /*** 'GET /:id' ***/
   describe('GET /:id', () => {
-    it('should return response with status code of 200 and all available movies', async () => {
-      await request(server)
+    it('should return response with status code of 200 and a requested movie matching id passed through params', async () => {
+      await request(app)
         .get(`/api/movie/${moviesDocs[0]._id}`)
         .set('Content-Type', 'application/json')
         .expect(200, moviesDocs[0]);
@@ -121,7 +120,7 @@ describe('/api/movie', () => {
     it('should call "next" middleware with an error obj as an argument, "next" will call error handling middleware which will return response with status 404 and message "Movie not found."', async () => {
       await Movie.deleteMany({});
 
-      await request(server)
+      await request(app)
         .get(`/api/movie/${moviesDocs[0]._id}`)
         .set('Content-Type', 'application/json')
         .expect(404)
@@ -138,7 +137,7 @@ describe('/api/movie', () => {
       const movie = { title, year, genre, description, imageUrl };
       await Movie.deleteMany({});
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send(movie)
         .set('Authorization', `Bearer ${token}`)
@@ -150,7 +149,7 @@ describe('/api/movie', () => {
       const movie = {};
       await Movie.deleteMany({});
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send(movie)
         .set('Authorization', `Bearer ${token}`)
@@ -162,7 +161,7 @@ describe('/api/movie', () => {
       const movie = { title: 'something' };
       await Movie.deleteMany({});
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send(movie)
         .set('Authorization', `Bearer ${token}`)
@@ -174,7 +173,7 @@ describe('/api/movie', () => {
       const movie = { title: 'something', year: 2000 };
       await Movie.deleteMany({});
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send(movie)
         .set('Authorization', `Bearer ${token}`)
@@ -186,7 +185,7 @@ describe('/api/movie', () => {
       const movie = { title: 'something', year: 2000, genre: 'something' };
       await Movie.deleteMany({});
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send(movie)
         .set('Authorization', `Bearer ${token}`)
@@ -203,7 +202,7 @@ describe('/api/movie', () => {
       };
       await Movie.deleteMany({});
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send(movie)
         .set('Authorization', `Bearer ${token}`)
@@ -215,7 +214,7 @@ describe('/api/movie', () => {
       const { title, year, genre, description, imageUrl } = moviesDocs[0];
       const movie = { title, year, genre, description, imageUrl };
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send(movie)
         .set('Authorization', `Bearer ${token}`)
@@ -232,7 +231,7 @@ describe('/api/movie', () => {
       err.statusCode = 422;
       sinon.stub(mongoose.Document.prototype, 'validate').throws(err);
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send(movie)
         .set('Authorization', `Bearer ${token}`)
@@ -250,7 +249,7 @@ describe('/api/movie', () => {
       const message = 'Database Error - document can not be created.';
       sinon.stub(mongoose.Model.prototype, 'save').throws(new Error(message));
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send(movie)
         .set('Authorization', `Bearer ${token}`)
@@ -262,7 +261,7 @@ describe('/api/movie', () => {
     });
 
     it('should return response with status of 401 and json object with prop "message" - "Could not authenticate.", if the "Authorization" header is not set.', async () => {
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send({})
         .set('Authorization', '')
@@ -273,7 +272,7 @@ describe('/api/movie', () => {
     it('should return response with status of 401 and json object with prop "message" - "jwt must be provided", if the "Authorization" header doesn\'t contain JWT.', async () => {
       token = '';
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send({})
         .set('Authorization', `Bearer ${token}`)
@@ -284,7 +283,7 @@ describe('/api/movie', () => {
     it('should return response with status of 401 and json object with prop "message" - "jwt malformed", if the "Authorization" header contains JWT which was malformed.', async () => {
       token = 'malformedJWT';
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send({})
         .set('Authorization', `Bearer ${token}`)
@@ -295,7 +294,7 @@ describe('/api/movie', () => {
     it('should return response with status of 403 and json object with prop "message" - "Not an admin. Access forbidden.", if req.admin prop is falsy', async () => {
       token = jwt.sign({ admin: false }, config.get('jwtPrivateKey'));
 
-      await request(server)
+      await request(app)
         .post('/api/movie')
         .send({})
         .set('Authorization', `Bearer ${token}`)

@@ -10,19 +10,23 @@ const mongoose = require('mongoose');
 
 const { Seat } = require('../../../models/seat');
 const { Room } = require('../../../models/room');
+const initializeDatabase = require('../../../seed/seed');
+const { initializeMinIO } = require('../../../bucket/minio');
 
 describe('/api/seat', () => {
-  let server, token, seatsDocs, roomsDocs, room_id;
+  let app, token, seatsDocs, roomsDocs, room_id;
 
-  before(() => {
-    server = require('../../../index');
-  });
+  before(async () => {
+    app = require('../../../index');
 
-  after(() => {
-    server.close();
+    await initializeDatabase();
+    await initializeMinIO();
   });
 
   beforeEach(async () => {
+    await Room.deleteMany({});
+    await Seat.deleteMany({});
+
     token = jwt.sign(
       { _id: '012345678901234567894321', admin: true },
       config.get('jwtPrivateKey')
@@ -56,11 +60,6 @@ describe('/api/seat', () => {
     await Seat.insertMany(seatsDocs);
   });
 
-  afterEach(async () => {
-    await Room.deleteMany({});
-    await Seat.deleteMany({});
-  });
-
   /*** 'GET /' ***/
   describe('GET /', () => {
     it('should return response with status 200 and json object, which contains found seats or no seats(empty array)', async () => {
@@ -69,7 +68,7 @@ describe('/api/seat', () => {
         return seatObj;
       });
 
-      await request(server)
+      await request(app)
         .get('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -91,7 +90,7 @@ describe('/api/seat', () => {
       err.statusCode = 500;
       sinon.stub(Seat, 'find').throws(err);
 
-      await request(server)
+      await request(app)
         .get('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -103,7 +102,7 @@ describe('/api/seat', () => {
     });
 
     it('should return response with status 401 and json object with "message" prop - "Could not authenticate!", if "Authorization" token is not present', async () => {
-      await request(server)
+      await request(app)
         .get('/api/seat')
         .set('Content-Type', 'application/json')
         .expect(401)
@@ -115,7 +114,7 @@ describe('/api/seat', () => {
     it('should return response with status 401 and json object with "message" prop - "jwt must be provided", if "Authorization" token is not present', async () => {
       token = '';
 
-      await request(server)
+      await request(app)
         .get('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -128,7 +127,7 @@ describe('/api/seat', () => {
     it('should return response with status 401 and json object with "message" prop - "jwt malformed", if "Authorization" token is not present', async () => {
       token = 'wrong';
 
-      await request(server)
+      await request(app)
         .get('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -147,7 +146,7 @@ describe('/api/seat', () => {
         return seatObj;
       });
 
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -167,7 +166,7 @@ describe('/api/seat', () => {
     it('should call "next" middleware with an err object and eventually return response with status 422 and json object, which contains "message" prop - "Invalid req parameters data.", if req contains "room_id" param, which is not of type ObjectId', async () => {
       room_id = 'wrong';
 
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -182,7 +181,7 @@ describe('/api/seat', () => {
       err.statusCode = 500;
       sinon.stub(Seat, 'find').throws(err);
 
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -194,7 +193,7 @@ describe('/api/seat', () => {
     });
 
     it('should return response with status 401 and json object with "message" prop - "Could not authenticate!", if "Authorization" token is not present', async () => {
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}`)
         .set('Content-Type', 'application/json')
         .expect(401)
@@ -206,7 +205,7 @@ describe('/api/seat', () => {
     it('should return response with status 401 and json object with "message" prop - "jwt must be provided", if "Authorization" token is not present', async () => {
       token = '';
 
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -219,7 +218,7 @@ describe('/api/seat', () => {
     it('should return response with status 401 and json object with "message" prop - "jwt malformed", if "Authorization" token is not present', async () => {
       token = 'wrong';
 
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -240,7 +239,7 @@ describe('/api/seat', () => {
     });
 
     it('should return response with status 200 and json object, which contains found seat, if wanted seat was found', async () => {
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}/${row}/${seatNumber}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -254,7 +253,7 @@ describe('/api/seat', () => {
     it('should call "next" middleware with an err obj and ultimately return response with status 404 and json object, which contains "message" prop - "Seat not found.", if wanted seat was not found', async () => {
       seatNumber = 200;
 
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}/${row}/${seatNumber}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -269,7 +268,7 @@ describe('/api/seat', () => {
       err.statusCode = 500;
       sinon.stub(Seat, 'findOne').throws(err);
 
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}/${row}/${seatNumber}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -281,7 +280,7 @@ describe('/api/seat', () => {
     });
 
     it('should return response with status 401 and json object with "message" prop - "Could not authenticate!", if "Authorization" token is not present', async () => {
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}/${row}/${seatNumber}`)
         .set('Content-Type', 'application/json')
         .expect(401)
@@ -293,7 +292,7 @@ describe('/api/seat', () => {
     it('should return response with status 401 and json object with "message" prop - "jwt must be provided", if "Authorization" token is not present', async () => {
       token = '';
 
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}/${row}/${seatNumber}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -306,7 +305,7 @@ describe('/api/seat', () => {
     it('should return response with status 401 and json object with "message" prop - "jwt malformed", if "Authorization" token is not present', async () => {
       token = 'wrong';
 
-      await request(server)
+      await request(app)
         .get(`/api/seat/${room_id}/${row}/${seatNumber}`)
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -330,7 +329,7 @@ describe('/api/seat', () => {
     });
 
     it('should return response with status 201 and json obj, which contains "message" prop - "Seat was successfully created.", if seat has been properly saved into database', async () => {
-      await request(server)
+      await request(app)
         .post('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -344,7 +343,7 @@ describe('/api/seat', () => {
     it('should call "presaveValidationHandler" with an err obj an ultimately return response with status 422 and json obj, which contains "message" prop - \'"room_id" with value "not an ObjectId" fails to match the valid mongo id pattern\', if one of request\'s payload props doesn\'t match its appropriate schema', async () => {
       seat.room_id = 'not an ObjectId';
 
-      await request(server)
+      await request(app)
         .post('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -360,7 +359,7 @@ describe('/api/seat', () => {
     it('should call "presaveValidationHandler" with an err obj an ultimately return response with status 409 and json obj, which contains "message" prop - "Seat has been already created.", if seat with same properties has been already created in database', async () => {
       await Seat.insertMany([seat]);
 
-      await request(server)
+      await request(app)
         .post('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -376,7 +375,7 @@ describe('/api/seat', () => {
       err.statusCode = 500;
       sinon.stub(mongoose.Model.prototype, 'save').throws(err);
 
-      await request(server)
+      await request(app)
         .post('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -389,7 +388,7 @@ describe('/api/seat', () => {
     });
 
     it('should return response with "statusCode" 401 and json object with "message" prop - "Could not authenticate!", if "Authorization" header is not present', async () => {
-      await request(server)
+      await request(app)
         .post('/api/seat')
         .set('Content-Type', 'application/json')
         .send(seat)
@@ -402,7 +401,7 @@ describe('/api/seat', () => {
     it('should return response with "statusCode" 401 and json object with "message" prop - "jwt must be provided", if JWT is not present', async () => {
       token = '';
 
-      await request(server)
+      await request(app)
         .post('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -416,7 +415,7 @@ describe('/api/seat', () => {
     it('should return response with "statusCode" 401 and json object with "message" prop - "jwt malformed", if JWT is not valid', async () => {
       token = 'invalid';
 
-      await request(server)
+      await request(app)
         .post('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -433,7 +432,7 @@ describe('/api/seat', () => {
         config.get('jwtPrivateKey')
       );
 
-      await request(server)
+      await request(app)
         .post('/api/seat')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)

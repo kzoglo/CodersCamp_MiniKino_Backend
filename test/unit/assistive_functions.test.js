@@ -10,6 +10,8 @@ const checkForExistingDoc = require('../../assistive_functions/checkForExistingD
 const { User } = require('../../models/user');
 const joiValidation = require('../../assistive_functions/joiValidation');
 const presaveValidationHandler = require('../../assistive_functions/presaveValidationHandler');
+const initializeDatabase = require('../../seed/seed');
+const { initializeMinIO } = require('../../bucket/minio');
 let validateId = require('../../assistive_functions/validateId').validateId;
 let validationMsg =
   require('../../assistive_functions/validateId').validationMsg;
@@ -148,7 +150,10 @@ describe('Assistive Functions', () => {
         User.findById.restore();
       });
 
-      before(() => {
+      before(async () => {
+        await initializeDatabase();
+        await initializeMinIO();
+
         validateId = require('../../assistive_functions/validateId').validateId;
         validationMsg =
           require('../../assistive_functions/validateId').validationMsg;

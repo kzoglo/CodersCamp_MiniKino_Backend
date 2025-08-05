@@ -9,42 +9,49 @@ const config = require('config');
 const sinon = require('sinon');
 
 const { Room } = require('../../../models/room');
+const initializeDatabase = require('../../../seed/seed');
+const { initializeMinIO } = require('../../../bucket/minio');
 
 describe('/api/room', () => {
-  let server, roomsDoc, room, token;
+  let app, roomsDoc, room, token;
+
+  beforeEach(() => {
+    room = { name: 1 };
+    token = jwt.sign(
+      { _id: '012345678901234567891234', admin: true },
+      config.get('jwtPrivateKey')
+    );
+  });
+
+  before(async () => {
+    app = require('../../../index');
+
+    await initializeDatabase();
+    await initializeMinIO();
+
+    await Room.deleteMany({});
+
+    roomsDoc = [
+      {
+        _id: '123401234567890123456789',
+        name: 2,
+      },
+      {
+        _id: '123401234567890123456780',
+        name: 3,
+      },
+    ];
+    await Room.insertMany(roomsDoc);
+  });
+
+  after(async () => {
+    await Room.deleteMany({});
+  });
 
   /*** 'POST /' ***/
   describe('POST /', () => {
-    beforeEach(() => {
-      room = { name: 1 };
-      token = jwt.sign(
-        { _id: '012345678901234567891234', admin: true },
-        config.get('jwtPrivateKey')
-      );
-    });
-
-    before(async () => {
-      server = require('../../../index');
-      roomsDoc = [
-        {
-          _id: '123401234567890123456789',
-          name: 2,
-        },
-        {
-          _id: '123401234567890123456780',
-          name: 3,
-        },
-      ];
-      await Room.insertMany(roomsDoc);
-    });
-
-    after(async () => {
-      await Room.deleteMany({});
-      server.close();
-    });
-
     it('should return response with status 201 and json object with a "message" prop - "Room successfully created.", if room was created successfully', async () => {
-      await request(server)
+      await request(app)
         .post('/api/room')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -56,7 +63,7 @@ describe('/api/room', () => {
     });
 
     it('should return response with status 401 and a "message" prop - "Could not authenticate!", if no "Authorization" header is set', async () => {
-      await request(server)
+      await request(app)
         .post('/api/room')
         .set('Content-Type', 'application/json')
         .send(room)
@@ -69,7 +76,7 @@ describe('/api/room', () => {
     it('should return response with status 401 and a "message" prop - "jwt must be provided", if no JWT in "Authorization" header is set', async () => {
       token = '';
 
-      await request(server)
+      await request(app)
         .post('/api/room')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -83,7 +90,7 @@ describe('/api/room', () => {
     it('should return response with status 401 and a "message" prop - "jwt malformed", if JWT in "Authorization" header is malformed', async () => {
       token = 'wrong';
 
-      await request(server)
+      await request(app)
         .post('/api/room')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -100,7 +107,7 @@ describe('/api/room', () => {
         config.get('jwtPrivateKey')
       );
 
-      await request(server)
+      await request(app)
         .post('/api/room')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -114,7 +121,7 @@ describe('/api/room', () => {
     it('should call "presaveValidationHandler" with an error obj and eventually return response with status 422 and json obj with a "message" prop - \'"name" must be a number\', if "name" prop in req payload is not a number', async () => {
       room.name = 'wrong';
 
-      await request(server)
+      await request(app)
         .post('/api/room')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -128,7 +135,7 @@ describe('/api/room', () => {
     it('should call "presaveValidationHandler" with an error obj and eventually return response with status 409 and json obj with a "message" prop - "Room has been already created.", if room with the same "name" prop has been already created', async () => {
       room = { name: 2 };
 
-      await request(server)
+      await request(app)
         .post('/api/room')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -145,7 +152,7 @@ describe('/api/room', () => {
       err.statusCode = 500;
       sinon.stub(mongoose.Model.prototype, 'save').throws(err);
 
-      await request(server)
+      await request(app)
         .post('/api/room')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
