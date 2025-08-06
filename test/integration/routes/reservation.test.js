@@ -162,7 +162,7 @@ describe('/api/reservation', () => {
         .expect(403)
         .then(({ body: { message } }) => {
           expect(message).to.be.eq(
-            "Not authorized. You're trying to access resource you do not have permission to."
+            'Not authorized. You\'re trying to access resource you do not have permission to.'
           );
         });
     });

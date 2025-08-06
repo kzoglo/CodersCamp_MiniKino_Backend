@@ -225,7 +225,7 @@ describe('/api/screening', () => {
 
     it('should return response with status 201 and json obj with a "message" prop - "Screening created successfully.", if screening has been written in database successfully', async () => {
       await request(app)
-        .post(`/api/screening/`)
+        .post('/api/screening/')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .send(screeningToWrite)
@@ -239,7 +239,7 @@ describe('/api/screening', () => {
       screeningToWrite.movie_id = 'wrong';
 
       await request(app)
-        .post(`/api/screening/`)
+        .post('/api/screening/')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .send(screeningToWrite)
@@ -255,7 +255,7 @@ describe('/api/screening', () => {
       await Screening.insertMany([screeningToWrite]);
 
       await request(app)
-        .post(`/api/screening/`)
+        .post('/api/screening/')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .send(screeningToWrite)
@@ -271,7 +271,7 @@ describe('/api/screening', () => {
       sinon.stub(mongoose.Model.prototype, 'save').throws(err);
 
       await request(app)
-        .post(`/api/screening/`)
+        .post('/api/screening/')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .send(screeningToWrite)
@@ -284,7 +284,7 @@ describe('/api/screening', () => {
 
     it('should return response with "statusCode" 401 and json object with "message" prop - "Could not authenticate!", if "Authorization" header is not present', async () => {
       await request(app)
-        .post(`/api/screening/`)
+        .post('/api/screening/')
         .set('Content-Type', 'application/json')
         .send(screeningToWrite)
         .expect(401)
@@ -297,7 +297,7 @@ describe('/api/screening', () => {
       token = '';
 
       await request(app)
-        .post(`/api/screening/`)
+        .post('/api/screening/')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .send(screeningToWrite)
@@ -311,7 +311,7 @@ describe('/api/screening', () => {
       token = 'invalid';
 
       await request(app)
-        .post(`/api/screening/`)
+        .post('/api/screening/')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .send(screeningToWrite)
@@ -328,7 +328,7 @@ describe('/api/screening', () => {
       );
 
       await request(app)
-        .post(`/api/screening/`)
+        .post('/api/screening/')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .send(screeningToWrite)

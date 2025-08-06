@@ -84,7 +84,7 @@ describe('/api/user', () => {
       const invalidData = [1, 1, 'kamil@', 'short', 'short'];
 
       for (let i = 0; i < invalidData.length; i++) {
-        let user = Object.assign({}, userToSave);
+        const user = Object.assign({}, userToSave);
 
         if (isEqual(i, 0)) user.name = invalidData[i];
         else if (isEqual(i, 1)) user.surname = invalidData[i];

@@ -222,11 +222,11 @@ describe('/api/movie', () => {
         .expect(409, { message: 'Movie has been already created.' });
     });
 
-    it("should return response with status of 500 and json object with prop 'message' - \"'title' is required\", if document can not be saved due to Model's validation error", async () => {
+    it('should return response with status of 500 and json object with prop \'message\' - "\'title\' is required", if document can not be saved due to Model\'s validation error', async () => {
       await Movie.deleteMany({});
       const { title, year, genre, description, imageUrl } = moviesDocs[0];
       const movie = { title, year, genre, description, imageUrl };
-      const message = "'title' is required";
+      const message = '\'title\' is required';
       const err = new Error(message);
       err.statusCode = 422;
       sinon.stub(mongoose.Document.prototype, 'validate').throws(err);
@@ -237,7 +237,7 @@ describe('/api/movie', () => {
         .set('Authorization', `Bearer ${token}`)
         .set('Content-Type', 'application/json')
         .expect(422, { message })
-        .then((res) => {
+        .then(() => {
           mongoose.Document.prototype.validate.restore();
         });
     });

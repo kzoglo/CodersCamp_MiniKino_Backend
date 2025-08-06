@@ -12,6 +12,7 @@ const users = require('./collections/users.json');
 const rooms = require('./collections/rooms.json');
 const seats = require('./collections/seats.json');
 const screenings = require('./collections/screenings.json');
+const logger = require('../assistive_functions/logger');
 const reservations = [];
 
 const clearDatabase = async () => {
@@ -22,7 +23,7 @@ const clearDatabase = async () => {
   await Room.deleteMany();
   await User.deleteMany();
 
-  console.log('Existing data cleared');
+  logger('Existing data cleared');
 };
 
 const seedDatabase = async () => {
@@ -33,7 +34,7 @@ const seedDatabase = async () => {
   await Screening.insertMany(screenings);
   await Reservation.insertMany(reservations);
 
-  console.log('Seed data added successfully');
+  logger('Seed data added successfully');
 };
 
 const initializeDatabase = async () => {
@@ -44,9 +45,9 @@ const initializeDatabase = async () => {
       : `mongodb://${dbHost}:${dbPort}/${dbName}`;
 
     await mongoose.connect(connectionString);
-    console.log(`Connected to MongoDB at ${dbHost}:${dbPort}`);
+    logger(`Connected to MongoDB at ${dbHost}:${dbPort}`);
 
-    await clearDatabase();
+    if (process.env.NODE_ENV !== 'production') await clearDatabase();
     await seedDatabase();
   } catch (err) {
     console.error('Database connection failed', err);

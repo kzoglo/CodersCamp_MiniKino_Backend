@@ -5,6 +5,5 @@
   "useTabs": false,
   "trailingComma": "es5",
   "printWidth": 80,
-  "bracketSpacing": true,
-  "yamlSortKeys": true
+  "bracketSpacing": true
 }

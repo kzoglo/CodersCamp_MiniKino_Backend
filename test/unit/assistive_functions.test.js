@@ -132,7 +132,7 @@ describe('Assistive Functions', () => {
       expect(spy.returned(422)).to.be.true;
     });
 
-    it("should call next() with error, which doesn't have statusCode of 422 if a name prop of that error is not equal to 'ValidationError'", () => {
+    it('should call next() with error, which doesn\'t have statusCode of 422 if a name prop of that error is not equal to \'ValidationError\'', () => {
       err.name = null;
       const spy = sinon.spy(next, 'next');
       presaveValidationHandler(err, next.next);
