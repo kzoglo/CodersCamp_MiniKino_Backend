@@ -1,7 +1,5 @@
-const mongoose = require('mongoose');
 const express = require('express');
 const config = require('config');
-const { dbName, dbPort, dbHost, password } = config.get('db');
 const app = express();
 
 const user = require('./routes/user');
@@ -12,9 +10,11 @@ const screening = require('./routes/screening');
 const reservation = require('./routes/reservation');
 const login = require('./routes/login');
 const { isEqual } = require('./predicates');
+const initializeDatabase = require('./seed/seed');
+const { initializeMinIO } = require('./bucket/minio');
 
 if (!config.get('jwtPrivateKey')) {
-  console.log('ERROR - jwtPrivateKey: Klucz prywatny nie został ustawiony');
+  console.error('ERROR - jwtPrivateKey: Klucz prywatny nie został ustawiony');
   process.exit(1);
 }
 
@@ -28,8 +28,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/images', express.static('images'));
-
 /*** Routing ***/
 app.use(express.json());
 app.use('/api/user', user);
@@ -40,38 +38,23 @@ app.use('/api/screening', screening);
 app.use('/api/reservation', reservation);
 app.use('/api/login', login);
 
-app.use((error, req, res, next) => {
+app.use((error, req, res, _) => {
   const { statusCode = 500, message, data } = error;
   res.status(statusCode).json({ message, data });
 });
 
+// TODO - to do zmiany bedzie
 if (isEqual(process.env.NODE_ENV, 'production')) require('./startup/prod')(app);
 
-const dbUri = (() => {
-  const nodeEnv = process.env.NODE_ENV;
-  // TODO - pierwszy i drugi case sa takie same imo
-  if (!nodeEnv) {
-    return `mongodb://${dbHost}:${dbPort}/${dbName}`;
-  } else if (isEqual(nodeEnv, 'testing')) {
-    return `mongodb://${dbHost}:${dbPort}/${dbName}`;
-  } else if (isEqual(nodeEnv, 'production')) {
-    // TODO - tu bedzie do zmiany
-    return `mongodb+srv://${dbHost}:${password}@cinemadb-20fmo.mongodb.net/${dbName}`;
-  }
-})();
-
 const port = process.env.PORT || 3001;
-const server = app.listen(port, () => {
-  console.log(`Listening on port ${port}...`);
 
-  mongoose
-    .connect(dbUri)
-    .then(() => {
-      console.log(`Connected to ${dbName}...`);
-    })
-    .catch((err) => {
-      console.error(`Could not connect to ${dbName}...`, err);
-    });
-});
+if (!isEqual(process.env.NODE_ENV, 'testing')) {
+  app.listen(port, async () => {
+    console.log(`Listening on port ${port}...`);
 
-module.exports = server;
+    await initializeDatabase();
+    await initializeMinIO();
+  });
+}
+
+module.exports = app;

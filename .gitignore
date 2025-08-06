@@ -5,3 +5,10 @@ coverage/
 minio/
 .zencoder/
 .DS_Store
+.github/
+.cursor/
+
+# Temporarly ignore prod files
+docker-compose.prod.yml
+docker-prod.sh
+deploy.yml

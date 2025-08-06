@@ -1,0 +1,68 @@
+name: minikino-test
+
+services:
+  # MongoDB for Testing
+  mongo-test:
+    image: mongo:7.0.7
+    volumes:
+      - mongo-test-data:/data/db
+    networks:
+      - minikino-test-network
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    command: ['mongod', '--quiet', '--logpath', '/dev/null']
+
+  # MinIO for Testing
+  minio-test:
+    image: minio/minio:RELEASE.2025-01-20T14-49-07Z
+    command: server /data --console-address ":9001"
+    ports:
+      - '9002:9000' # API S3 (different from dev port 9000)
+      - '9003:9001' # Console (different from dev port 9001)
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+      - MINIO_LOGGER_QUIET=true
+    volumes:
+      - type: tmpfs
+        target: /data
+    networks:
+      - minikino-test-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Test Runner
+  test-runner:
+    build:
+      context: .
+      dockerfile: node.Dockerfile
+    environment:
+      - NODE_ENV=testing
+      - CINEMA_JWT_PRIVATE_KEY=testvalue
+      - PORT=3001
+      - MINIO_ENDPOINT=minio-test
+      - MINIO_PORT=9000
+      - TEST_FILE=${TEST_FILE}
+    depends_on:
+      mongo-test:
+        condition: service_healthy
+      minio-test:
+        condition: service_healthy
+    networks:
+      - minikino-test-network
+    restart: unless-stopped
+    command: sh -c "if [ -n \"$$TEST_FILE\" ] && [ \"$$TEST_FILE\" != \"\" ]; then npm run test:file \"$$TEST_FILE\"; else npm run test; fi"
+
+volumes:
+  mongo-test-data:
+    driver: local
+
+networks:
+  minikino-test-network:
+    driver: bridge

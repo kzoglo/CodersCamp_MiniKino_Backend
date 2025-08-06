@@ -2,6 +2,6 @@
   "db": {
     "dbName": "CC5_Cinema_tests",
     "dbPort": 27017,
-    "dbHost": "localhost"
+    "dbHost": "mongo-test"
   }
 }

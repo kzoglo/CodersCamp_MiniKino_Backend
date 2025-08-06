@@ -1,0 +1,8 @@
+{
+  "db": {
+    "dbName": "CC5_Cinema",
+    "dbPort": 27017,
+    "dbHost": "mongo",
+    "password": "example"
+  }
+}

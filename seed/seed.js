@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 const config = require('config');
+const { isEqual } = require('../predicates');
+const logger = require('../assistive_functions/logger');
+
 const { User } = require('../models/user');
 const { Room } = require('../models/room');
 const { Seat } = require('../models/seat');
@@ -12,7 +15,7 @@ const users = require('./collections/users.json');
 const rooms = require('./collections/rooms.json');
 const seats = require('./collections/seats.json');
 const screenings = require('./collections/screenings.json');
-const logger = require('../assistive_functions/logger');
+
 const reservations = [];
 
 const clearDatabase = async () => {
@@ -47,7 +50,7 @@ const initializeDatabase = async () => {
     await mongoose.connect(connectionString);
     logger(`Connected to MongoDB at ${dbHost}:${dbPort}`);
 
-    if (process.env.NODE_ENV !== 'production') await clearDatabase();
+    if (!isEqual(process.env.NODE_ENV, 'production')) await clearDatabase();
     await seedDatabase();
   } catch (err) {
     console.error('Database connection failed', err);

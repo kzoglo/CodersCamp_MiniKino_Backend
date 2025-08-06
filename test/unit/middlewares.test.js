@@ -32,7 +32,7 @@ describe('Middleware', () => {
     const res = {};
     const next = () => {};
 
-    it("should return an error 422 with a message 'Invalid params data.' if all req params are not of type objectId", () => {
+    it('should return an error 422 with a message \'Invalid params data.\' if all req params are not of type objectId', () => {
       for (const key in params) {
         const req = {
           params: {
