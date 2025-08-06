@@ -5,7 +5,6 @@ coverage/
 minio/
 .zencoder/
 .DS_Store
-.github/
 .cursor/
 
 # Temporarly ignore prod files
