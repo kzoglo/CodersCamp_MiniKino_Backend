@@ -1,32 +1,62 @@
 const mongoose = require('mongoose');
-const User = require('./models/user');
-const Room = require('./models/room');
-const Seat = require('./models/seat');
-const Movie = require('./models/movie');
-const Screening = require('./models/screening');
-const Reservation = require('./models/reservation');
+const config = require('config');
+const { isEqual } = require('../predicates');
+const logger = require('../assistive_functions/logger');
 
-const movies = [];
+const { User } = require('../models/user');
+const { Room } = require('../models/room');
+const { Seat } = require('../models/seat');
+const { Movie } = require('../models/movie');
+const { Screening } = require('../models/screening');
+const { Reservation } = require('../models/reservation');
 
-mongoose
-  // TODO - tutaj connect musi isc oparty na zmiennych srodowiskowych
-  .connect('mongodb://localhost:27017/moviesDB', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(async () => {
-    console.log('Connected to MongoDB');
+const movies = require('./collections/movies.json');
+const users = require('./collections/users.json');
+const rooms = require('./collections/rooms.json');
+const seats = require('./collections/seats.json');
+const screenings = require('./collections/screenings.json');
 
-    // Usuwanie istniejących dokumentów
-    await Movie.deleteMany();
-    console.log('Existing data cleared');
+const reservations = [];
 
-    // Wstawianie nowych danych
-    await Movie.insertMany(movies);
-    console.log('Seed data added successfully');
+const clearDatabase = async () => {
+  await Movie.deleteMany();
+  await Reservation.deleteMany();
+  await Screening.deleteMany();
+  await Seat.deleteMany();
+  await Room.deleteMany();
+  await User.deleteMany();
 
-    mongoose.disconnect();
-  })
-  .catch((err) => {
+  logger('Existing data cleared');
+};
+
+const seedDatabase = async () => {
+  await User.insertMany(users);
+  await Movie.insertMany(movies);
+  await Room.insertMany(rooms);
+  await Seat.insertMany(seats);
+  await Screening.insertMany(screenings);
+  await Reservation.insertMany(reservations);
+
+  logger('Seed data added successfully');
+};
+
+const initializeDatabase = async () => {
+  try {
+    const { dbName, dbPort, dbHost, password } = config.get('db');
+    const connectionString = password
+      ? `mongodb://root:${password}@${dbHost}:${dbPort}/${dbName}?authSource=admin`
+      : `mongodb://${dbHost}:${dbPort}/${dbName}`;
+
+    await mongoose.connect(connectionString);
+    logger(`Connected to MongoDB at ${dbHost}:${dbPort}`);
+
+    if (!isEqual(process.env.NODE_ENV, 'production')) await clearDatabase();
+    await seedDatabase();
+  } catch (err) {
     console.error('Database connection failed', err);
-  });
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+};
+
+module.exports = initializeDatabase;

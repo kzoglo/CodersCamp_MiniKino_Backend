@@ -4,7 +4,6 @@ const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const proxyquire = require('proxyquire');
 const jwt = require('jsonwebtoken');
 
 const areParamsObjectIds = require('../../middleware/areParamsObjectIds');
@@ -33,7 +32,7 @@ describe('Middleware', () => {
     const res = {};
     const next = () => {};
 
-    it("should return an error 422 with a message 'Invalid params data.' if all req params are not of type objectId", () => {
+    it('should return an error 422 with a message \'Invalid params data.\' if all req params are not of type objectId', () => {
       for (const key in params) {
         const req = {
           params: {
@@ -104,7 +103,7 @@ describe('Middleware', () => {
       expect(spyNext.called).to.be.true;
     });
 
-    it("should return 'next' middleware with an error as an argument, which has 'statuCode' prop of 403 and 'message' prop - 'Not an admin. Access forbidden.', if req.admin prop is not equal to 'true'", () => {
+    it('should return "next" middleware with an error as an argument, which has "statuCode" prop of 403 and "message" prop - "Not an admin. Access forbidden., if req.admin prop is not equal to "true"', () => {
       req.admin = false;
       const result = isAdmin(req, res, nextObj.next);
 
@@ -120,7 +119,7 @@ describe('Middleware', () => {
 
   /*** isAuth ***/
   describe('isAuth', () => {
-    let req, res, nextObj, spy, verifyStub;
+    let req, res, nextObj, spy, verifyStub; // eslint-disable-line no-unused-vars
 
     beforeEach(() => {
       req = {

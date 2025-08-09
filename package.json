@@ -1,14 +1,20 @@
 {
   "name": "coderscamp_minikino_backend",
-  "version": "2.0.3",
+  "version": "2.0.8",
   "description": "REST API for cinema tickets reservation.",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=testing ALLOW_CONFIG_MUTATIONS=true CINEMA_JWT_PRIVATE_KEY=testvalue mocha --recursive --timeout 2000 --exit test",
-    "test-with-coverage": "nyc --all=true --reporter=html --reporter=text npm test",
-    "start": "cross-env CINEMA_JWT_PRIVATE_KEY=testvalue nodemon index.js",
-    "heroku": "node index.js",
-    "format": "prettier --write ."
+    "test": "cross-env NODE_ENV=testing ALLOW_CONFIG_MUTATIONS=true CINEMA_JWT_PRIVATE_KEY=testvalue mocha --timeout 2000 --exit 'test/**/*.test.js'",
+    "test:file": "cross-env NODE_ENV=testing ALLOW_CONFIG_MUTATIONS=true CINEMA_JWT_PRIVATE_KEY=testvalue mocha --timeout 2000 --exit",
+    "test:docker": "bash test-run.sh",
+    "start": "bash docker-start.sh",
+    "dev": "nodemon index.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check . || true",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "ci": "npm run format:check && npm run lint && npm install",
+    "precommit": "npm run format && npm run lint:fix"
   },
   "engines": {
     "npm": "10.7.0",
@@ -40,14 +46,16 @@
     "joi": "^17.2.1",
     "joi-objectid": "^4.0.2",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.7.0",
-    "mongoose": "^8.4.0",
+    "minio": "^8.0.4",
+    "mongodb": "^6.12.0",
+    "mongoose": "^8.9.5",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "chai": "^5.1.1",
+    "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
     "cross-env": "^7.0.2",
+    "eslint": "^8.57.0",
     "mocha": "^10.4.0",
     "nodemon": "^3.1.2",
     "nyc": "^15.1.0",

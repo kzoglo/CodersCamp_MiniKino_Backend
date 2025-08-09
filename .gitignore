@@ -2,3 +2,12 @@ node_modules/
 .vscode/
 .nyc_output/
 coverage/
+minio/
+.zencoder/
+.DS_Store
+.cursor/
+
+# Temporarly ignore prod files
+docker-compose.prod.yml
+docker-prod.sh
+deploy.yml

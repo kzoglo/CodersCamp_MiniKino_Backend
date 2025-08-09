@@ -10,6 +10,8 @@ const checkForExistingDoc = require('../../assistive_functions/checkForExistingD
 const { User } = require('../../models/user');
 const joiValidation = require('../../assistive_functions/joiValidation');
 const presaveValidationHandler = require('../../assistive_functions/presaveValidationHandler');
+const initializeDatabase = require('../../seed/seed');
+const { initializeMinIO } = require('../../bucket/minio');
 let validateId = require('../../assistive_functions/validateId').validateId;
 let validationMsg =
   require('../../assistive_functions/validateId').validationMsg;
@@ -130,7 +132,7 @@ describe('Assistive Functions', () => {
       expect(spy.returned(422)).to.be.true;
     });
 
-    it("should call next() with error, which doesn't have statusCode of 422 if a name prop of that error is not equal to 'ValidationError'", () => {
+    it('should call next() with error, which doesn\'t have statusCode of 422 if a name prop of that error is not equal to \'ValidationError\'', () => {
       err.name = null;
       const spy = sinon.spy(next, 'next');
       presaveValidationHandler(err, next.next);
@@ -148,7 +150,10 @@ describe('Assistive Functions', () => {
         User.findById.restore();
       });
 
-      before(() => {
+      before(async () => {
+        await initializeDatabase();
+        await initializeMinIO();
+
         validateId = require('../../assistive_functions/validateId').validateId;
         validationMsg =
           require('../../assistive_functions/validateId').validationMsg;

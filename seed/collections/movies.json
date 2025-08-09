@@ -1,119 +1,119 @@
 [
   {
-    "_id": { "$oid": "5e0f6fb41176281fe8dcc9aa" },
+    "_id": "5e0f6fb41176281fe8dcc9aa",
     "title": "Jak wytresować smoka 3",
-    "year": { "$numberInt": "2018" },
+    "year": 2018,
     "genre": "animowane",
     "description": "Gdy Czkawka zmaga się zadaniami wodza Berk, Szczerbatek trafia na trop tajemniczej smoczycy.",
-    "imageUrl": "images/movies/jak_wytresowac_smoka_3.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "jak_wytresowac_smoka_3.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6f711176281fe8dcc9a0" },
+    "_id": "5e0f6f711176281fe8dcc9a0",
     "title": "Jumanji",
-    "year": { "$numberInt": "2019" },
+    "year": 2019,
     "genre": "komedia",
     "description": "Jumanji: Następny poziom to powrót słynnych bohaterów, których poznaliśmy w ,,Jumanji: Przygoda w dżungli''. Tyle że zasady gry zmieniły się",
-    "imageUrl": "images/movies/jumanji.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "jumanji.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6f831176281fe8dcc9a2" },
+    "_id": "5e0f6f831176281fe8dcc9a2",
     "title": "Alladyn",
-    "year": { "$numberInt": "2018" },
+    "year": 2018,
     "genre": "animowana",
     "description": "Bohater jednej z opowieści Księgi tysiąca i jednej nocy, który staje się właścicielem zaczarowanej lampy, zamieszkiwanej przez potężnego, spełniającego życzenia dżinna.",
-    "imageUrl": "images/movies/alladyn.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "alladyn.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6f961176281fe8dcc9a5" },
+    "_id": "5e0f6f961176281fe8dcc9a5",
     "title": "Kapitan Marvel",
-    "year": { "$numberInt": "2019" },
+    "year": 2019,
     "genre": "akcja, fantastyka",
     "description": "Ziemska kobieta po kontakcie z obcą rasą Kree otrzymuje nadludzkie moce.",
-    "imageUrl": "images/movies/kapitan_marvel.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "kapitan_marvel.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6fbb1176281fe8dcc9ab" },
+    "_id": "5e0f6fbb1176281fe8dcc9ab",
     "title": "Ślimaczki",
-    "year": { "$numberInt": "2017" },
+    "year": 2017,
     "genre": "animowane",
     "description": "Czarne zmutowane ślimaki atakują miasteczko. Tylko pracownik służby zdrowia, Mike Brady domyśla się prawdy",
-    "imageUrl": "images/movies/slimaczki.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "slimaczki.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6fa31176281fe8dcc9a7" },
+    "_id": "5e0f6fa31176281fe8dcc9a7",
     "title": "IT 2",
-    "year": { "$numberInt": "2017" },
+    "year": 2017,
     "genre": "horror",
     "description": "27 lat po tragicznych wydarzeniach w Derry dorośli członkowie Klubu frajerów powracają do miasteczka, aby ponownie zmierzyć się z zabójczym klaunem.",
-    "imageUrl": "images/movies/it_2.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "it_2.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6f911176281fe8dcc9a4" },
+    "_id": "5e0f6f911176281fe8dcc9a4",
     "title": "Star Wars ",
-    "year": { "$numberInt": "2020" },
+    "year": 2020,
     "genre": "przygodowy",
     "description": "Członkowie organizacji Ruchu Oporu ponownie stawiają czoła Najwyższemu Porządkowi.",
-    "imageUrl": "images/movies/star_wars.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "star_wars.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6f891176281fe8dcc9a3" },
+    "_id": "5e0f6f891176281fe8dcc9a3",
     "title": "Gemini man",
-    "year": { "$numberInt": "2019" },
+    "year": 2019,
     "genre": "akcja",
     "description": "Elitarny zabójca zostaje zaatakowany przez młodego mężczyznę, który potrafi przewidzieć każdy jego ruch.",
-    "imageUrl": "images/movies/gemini_man.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "gemini_man.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6f9d1176281fe8dcc9a6" },
+    "_id": "5e0f6f9d1176281fe8dcc9a6",
     "title": "Joker",
-    "year": { "$numberInt": "2011" },
+    "year": 2011,
     "genre": "horror",
     "description": "Strudzony życiem komik popada w obłęd i staje się psychopatycznym mordercą.",
-    "imageUrl": "images/movies/joker.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "joker.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6fae1176281fe8dcc9a9" },
+    "_id": "5e0f6fae1176281fe8dcc9a9",
     "title": "Pewnego razu... w Hollywood",
-    "year": { "$numberInt": "2019" },
+    "year": 2019,
     "genre": "komedia",
     "description": "Aktor Rick Dalton i jego przyjaciel kaskader powracają do Hollywood. Mężczyźni próbują odnaleźć się w przemyśle filmowym, który ewoluował podczas ich nieobecności.",
-    "imageUrl": "images/movies/pewnego_razu_w_hollywood.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "pewnego_razu_w_hollywood.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6f7c1176281fe8dcc9a1" },
+    "_id": "5e0f6f7c1176281fe8dcc9a1",
     "title": "Avengers",
-    "year": { "$numberInt": "2012" },
+    "year": 2012,
     "genre": "fantastyka",
     "description": "amerykański fantastycznonaukowy film akcji na podstawie serii komiksów o grupie superbohaterów o tej samej nazwie wydawnictwa Marvel Comics. Za reżyserię i za scenariusz odpowiada Joss Whedon, a za produkcję Kevina Feige. W głównych rolach występują: Robert Downey Jr., Chris Evans, Mark Ruffalo, Chris Hemsworth, Scarlett Johansson, Jeremy Renner, Tom Hiddleston, Clark Gregg, Cobie Smulders, Stellan Skarsgård i Samuel L. Jackson.",
-    "imageUrl": "images/movies/avengers.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "avengers.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6fc11176281fe8dcc9ac" },
+    "_id": "5e0f6fc11176281fe8dcc9ac",
     "title": "Kraina lodu 2",
-    "year": { "$numberInt": "2019" },
+    "year": 2019,
     "genre": "animowane",
     "description": "Elsa i Anna wraz z przyjaciółmi udają się do Zaczarowanego Lasu w poszukiwaniu pomocy dla swego Królestwa.",
-    "imageUrl": "images/movies/kraina_lodu_2.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "kraina_lodu_2.jpg",
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0f6fa91176281fe8dcc9a8" },
+    "_id": "5e0f6fa91176281fe8dcc9a8",
     "title": "Split",
-    "year": { "$numberInt": "2019" },
+    "year": 2019,
     "genre": "thriller",
     "description": "Członkowie organizacji Ruchu Oporu ponownie stawiają czoła Najwyższemu Porządkowi.",
-    "imageUrl": "images/movies/split.jpg",
-    "__v": { "$numberInt": "0" }
+    "imageUrl": "split.jpg",
+    "__v": 0
   }
 ]

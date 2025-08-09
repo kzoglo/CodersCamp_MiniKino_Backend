@@ -21,8 +21,9 @@
 
 ## Prerequisites
 
-- npm >6.0.0
-- node >=8.0.0
+- Docker and Docker Compose
+- npm 10.7.0
+- node 20.14.0
 
 ## Install
 
@@ -32,15 +33,40 @@ npm install
 
 ## Usage
 
-```sh
-npm run start
-```
-
-## Run tests
+### Development Environment (Docker)
 
 ```sh
-npm test
+npm start
 ```
+
+This starts the full development environment with:
+
+- API server on `http://localhost:3001`
+- MongoDB on `localhost:27018`
+- MinIO on `http://localhost:9000` (console: `http://localhost:9001`)
+
+## Run Tests
+
+### Simple One-Command Testing
+
+```sh
+npm run test:docker
+```
+
+This automatically builds test containers, runs tests inside Docker, and cleans up.
+
+⚠️ **Don't use `npm test` or `npm run test:file tests-path`** - it doesn't work with the containerized setup
+
+### Test Coverage
+
+```sh
+npm run test-with-coverage
+```
+
+## Docker Commands
+
+- `npm start` - Start development environment
+- `npm run test:docker` - Run tests (recommended)
 
 ## Author
 

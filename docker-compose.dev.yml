@@ -1,0 +1,76 @@
+services:
+  # Node.js Application
+  app:
+    build:
+      context: .
+      dockerfile: node.Dockerfile
+    container_name: minikino-app
+    ports:
+      - '3001:3001'
+    environment:
+      - NODE_ENV=docker
+      - CINEMA_JWT_PRIVATE_KEY=testvalue
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - PORT=3001
+    depends_on:
+      - mongo
+      - minio
+    volumes:
+      # For development - enables hot reload
+      - .:/app
+      - /app/node_modules
+    networks:
+      - minikino-network
+    restart: unless-stopped
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:RELEASE.2025-01-20T14-49-07Z
+    container_name: minikino-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - '9000:9000' # API S3
+      - '9001:9001' # Console
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+    volumes:
+      - ./minio/data:/data
+    networks:
+      - minikino-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  # MongoDB Database
+  mongo:
+    image: mongo:7.0.7
+    container_name: minikino-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - '27018:27017' # Keep external port for local access
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - minikino-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 1
+    command: ['mongod', '--quiet', '--logpath', '/dev/null']
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  minikino-network:
+    driver: bridge

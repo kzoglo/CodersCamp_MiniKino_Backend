@@ -29,7 +29,7 @@ module.exports.getReservations = async (
           });
       } else {
         handleErrors(
-          "Not authorized. You're trying to access resource you do not have permission to.",
+          'Not authorized. You\'re trying to access resource you do not have permission to.',
           403
         );
       }
@@ -67,7 +67,7 @@ module.exports.postReservation = async (
       Reservation
     );
 
-    let reservation = new Reservation({
+    const reservation = new Reservation({
       user_id,
       seat_id,
       screening_id,

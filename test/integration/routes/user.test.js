@@ -11,19 +11,22 @@ const bcrypt = require('bcryptjs');
 const { isEqual } = require('../../../predicates');
 
 const { User } = require('../../../models/user');
+const initializeDatabase = require('../../../seed/seed');
+const { initializeMinIO } = require('../../../bucket/minio');
 
 describe('/api/user', () => {
-  let server, token, user, userToSave;
+  let app, token, user, userToSave;
 
-  before(() => {
-    server = require('../../../index');
-  });
+  before(async () => {
+    app = require('../../../index');
 
-  after(() => {
-    server.close();
+    await initializeDatabase();
+    await initializeMinIO();
   });
 
   beforeEach(async () => {
+    await User.deleteMany({});
+
     token = jwt.sign(
       { _id: '012345678901234567891234', admin: true },
       config.get('jwtPrivateKey')
@@ -50,14 +53,10 @@ describe('/api/user', () => {
     await User.insertMany([user]);
   });
 
-  afterEach(async () => {
-    await User.deleteMany({});
-  });
-
   /*** 'POST /' ***/
   describe('POST /', () => {
     it('should return response with status 201 and json obj with "message" prop - "User created successfully.", if standard user account (not an admin) has been successfully created', async () => {
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .send(userToSave)
@@ -70,7 +69,7 @@ describe('/api/user', () => {
     it('should return response with status 201 and json obj with "message" prop - "User created successfully.", if admin account has been successfully created', async () => {
       userToSave.admin = true;
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -85,7 +84,7 @@ describe('/api/user', () => {
       const invalidData = [1, 1, 'kamil@', 'short', 'short'];
 
       for (let i = 0; i < invalidData.length; i++) {
-        let user = Object.assign({}, userToSave);
+        const user = Object.assign({}, userToSave);
 
         if (isEqual(i, 0)) user.name = invalidData[i];
         else if (isEqual(i, 1)) user.surname = invalidData[i];
@@ -94,7 +93,7 @@ describe('/api/user', () => {
         else if (isEqual(i, 4)) user.confirmPassword = invalidData[i];
         else if (isEqual(i, 5)) user.admin = invalidData[i];
 
-        await request(server)
+        await request(app)
           .post('/api/user')
           .set('Content-Type', 'application/json')
           .send(user)
@@ -108,7 +107,7 @@ describe('/api/user', () => {
     it('should call "presaveValidationHandler" with an err obj and eventually return response with status 422 and json obj with "message" - \'"admin" must be a boolean\' property, if "admin" property provided in request payload is not consistent with user schema', async () => {
       user.admin = 'notBoolean';
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -122,7 +121,7 @@ describe('/api/user', () => {
     it('should call "presaveValidationHandler" with an err obj and return response with status 422 and json obj with "message" prop - "Password needs to be identical.", if request contains different "password" and "confirmPass" props', async () => {
       userToSave.confirmPassword = '87654321';
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .send(userToSave)
@@ -135,7 +134,7 @@ describe('/api/user', () => {
     it('should call "presaveValidationHandler" with an err obj and return response with status 409 and json obj with "message" prop - "User has been already created.", if the user with same "email" has been already created', async () => {
       await User.insertMany([userToSave]);
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .send(userToSave)
@@ -150,7 +149,7 @@ describe('/api/user', () => {
       err.statusCode = 500;
       sinon.stub(bcrypt, 'genSalt').throws(err);
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .send(userToSave)
@@ -168,7 +167,7 @@ describe('/api/user', () => {
       err.statusCode = 500;
       sinon.stub(bcrypt, 'hash').throws(err);
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .send(userToSave)
@@ -186,7 +185,7 @@ describe('/api/user', () => {
       err.statusCode = 500;
       sinon.stub(mongoose.Model.prototype, 'save').throws(err);
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .send(userToSave)
@@ -200,7 +199,7 @@ describe('/api/user', () => {
     it('should return response with status 401 and json obj with "message" prop - "Could not authenticate!", if "Authentication" header is not present, while trying to create an admin account', async () => {
       userToSave.admin = true;
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .send(userToSave)
@@ -214,7 +213,7 @@ describe('/api/user', () => {
       userToSave.admin = true;
       token = '';
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -229,7 +228,7 @@ describe('/api/user', () => {
       userToSave.admin = true;
       token = 'wrong';
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
@@ -247,7 +246,7 @@ describe('/api/user', () => {
         config.get('jwtPrivateKey')
       );
 
-      await request(server)
+      await request(app)
         .post('/api/user')
         .set('Content-Type', 'application/json')
         .set('Authorization', `Bearer ${token}`)

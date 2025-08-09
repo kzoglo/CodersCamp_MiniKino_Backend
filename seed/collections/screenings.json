@@ -1,37 +1,37 @@
 [
   {
-    "_id": { "$oid": "5e0b54c9475b3f35c48c861c" },
-    "movie_id": { "$oid": "5e0f6f711176281fe8dcc9a0" },
-    "room_id": { "$oid": "5ea7da1a5dacb119b8a75eb9" },
-    "time": { "$date": { "$numberLong": "1830297600000" } },
-    "__v": { "$numberInt": "0" }
+    "_id": "5e0b54c9475b3f35c48c861c",
+    "movie_id": "5e0f6f711176281fe8dcc9a0",
+    "room_id": "5ea7da1a5dacb119b8a75eb9",
+    "time": 1830297600000,
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0b79dfb2ab90272c564116" },
-    "movie_id": { "$oid": "5e0f6f891176281fe8dcc9a3" },
-    "room_id": { "$oid": "5ea7da1a5dacb119b8a75eb9" },
-    "time": { "$date": { "$numberLong": "1833552000000" } },
-    "__v": { "$numberInt": "0" }
+    "_id": "5e0b79dfb2ab90272c564116",
+    "movie_id": "5e0f6f891176281fe8dcc9a3",
+    "room_id": "5ea7da1a5dacb119b8a75eb9",
+    "time": 1833552000000,
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0b79d6b2ab90272c564115" },
-    "movie_id": { "$oid": "5e0f6f7c1176281fe8dcc9a1" },
-    "room_id": { "$oid": "5ea7da1a5dacb119b8a75eb9" },
-    "time": { "$date": { "$numberLong": "1833638400000" } },
-    "__v": { "$numberInt": "0" }
+    "_id": "5e0b79d6b2ab90272c564115",
+    "movie_id": "5e0f6f7c1176281fe8dcc9a1",
+    "room_id": "5ea7da1a5dacb119b8a75eb9",
+    "time": 1833638400000,
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e0ddcee66ba8818981b802f" },
-    "movie_id": { "$oid": "5e0f6f9d1176281fe8dcc9a6" },
-    "room_id": { "$oid": "5ea7da1a5dacb119b8a75eb9" },
-    "time": { "$date": { "$numberLong": "1844793600000" } },
-    "__v": { "$numberInt": "0" }
+    "_id": "5e0ddcee66ba8818981b802f",
+    "movie_id": "5e0f6f9d1176281fe8dcc9a6",
+    "room_id": "5ea7da1a5dacb119b8a75eb9",
+    "time": 1844793600000,
+    "__v": 0
   },
   {
-    "_id": { "$oid": "5e735ded55213e267866ca83" },
-    "movie_id": { "$oid": "5e0f6f7c1176281fe8dcc9a1" },
-    "room_id": { "$oid": "5ea7da1a5dacb119b8a75eb9" },
-    "time": { "$date": { "$numberLong": "1851312000000" } },
-    "__v": { "$numberInt": "0" }
+    "_id": "5e735ded55213e267866ca83",
+    "movie_id": "5e0f6f7c1176281fe8dcc9a1",
+    "room_id": "5ea7da1a5dacb119b8a75eb9",
+    "time": 1851312000000,
+    "__v": 0
   }
 ]
