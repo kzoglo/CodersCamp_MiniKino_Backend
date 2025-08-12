@@ -83,20 +83,12 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./node.Dockerfile
-          push: false
-          tags: minikino-backend:test
-          build-args: |
-            RUN_ENV=ci
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          outputs: type=docker,dest=/tmp/image.tar
-
-      - name: Load Docker image
-        run: docker load --input /tmp/image.tar
+        run: |
+          docker build \
+            --build-arg RUN_ENV=ci \
+            -f node.Dockerfile \
+            -t minikino-backend:test \
+            .
 
       - name: Test Docker image
         run: |
