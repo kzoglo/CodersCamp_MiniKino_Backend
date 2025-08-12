@@ -92,6 +92,10 @@ jobs:
             RUN_ENV=ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/image.tar
+
+      - name: Load Docker image
+        run: docker load --input /tmp/image.tar
 
       - name: Test Docker image
         run: |
