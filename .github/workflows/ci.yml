@@ -6,8 +6,34 @@ on:
   pull_request:
     branches: [master, develop]
   workflow_dispatch:
+    inputs:
+      choice_test:
+        description: 'Environment to run tests against'
+        required: false
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - staging
+          - production
+      bool_test:
+        description: 'Run code quality checks'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
+  check_manual_dispatch:
+    name: Check Manual Dispatch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: |
+          echo 1-choice: ${{ github.event.inputs.choice_test }}
+          echo 1-bool: ${{ github.event.inputs.bool_test }}
+          echo 2-choice: ${{ inputs.choice_test }}
+          echo 2-bool: ${{ inputs.bool_test }}
+
   code-quality:
     name: Code Quality & Formatting
     runs-on: ubuntu-latest
