@@ -5,35 +5,8 @@ on:
     branches: [master, develop]
   pull_request:
     branches: [master, develop]
-  workflow_dispatch:
-    inputs:
-      choice_test:
-        description: 'Environment to run tests against'
-        required: false
-        default: 'test'
-        type: choice
-        options:
-          - test
-          - staging
-          - production
-      bool_test:
-        description: 'Run code quality checks'
-        required: false
-        default: true
-        type: boolean
 
 jobs:
-  check_manual_dispatch:
-    name: Check Manual Dispatch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run tests
-        run: |
-          echo 1-choice: ${{ github.event.inputs.choice_test }}
-          echo 1-bool: ${{ github.event.inputs.bool_test }}
-          echo 2-choice: ${{ inputs.choice_test }}
-          echo 2-bool: ${{ inputs.bool_test }}
-
   code-quality:
     name: Code Quality & Formatting
     runs-on: ubuntu-latest
@@ -109,7 +82,16 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -f node.Dockerfile -t minikino-backend:test .
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./node.Dockerfile
+          push: false
+          tags: minikino-backend:test
+          build-args: |
+            RUN_ENV=ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Test Docker image
         run: |
