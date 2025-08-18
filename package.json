@@ -4,8 +4,8 @@
   "description": "REST API for cinema tickets reservation.",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=testing ALLOW_CONFIG_MUTATIONS=true CINEMA_JWT_PRIVATE_KEY=testvalue mocha --timeout 2000 --exit 'test/**/*.test.js'",
-    "test:file": "cross-env NODE_ENV=testing ALLOW_CONFIG_MUTATIONS=true CINEMA_JWT_PRIVATE_KEY=testvalue mocha --timeout 2000 --exit",
+    "test": "cross-env ALLOW_CONFIG_MUTATIONS=true mocha --timeout 2000 --exit 'test/**/*.test.js'",
+    "test:file": "cross-env ALLOW_CONFIG_MUTATIONS=true mocha --timeout 2000 --exit",
     "test:docker": "bash test-run.sh",
     "start": "bash docker-start.sh",
     "dev": "nodemon index.js",

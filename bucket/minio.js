@@ -1,6 +1,7 @@
 const Client = require('minio').Client;
 const fs = require('fs');
 const path = require('path');
+const config = require('config');
 const logger = require('../assistive_functions/logger');
 
 async function setBucketPublicReadPolicy(minioClient, bucketName) {
@@ -28,11 +29,10 @@ async function setBucketPublicReadPolicy(minioClient, bucketName) {
 }
 
 const initializeMinIO = async (bucket = 'movies') => {
-  const endPoint = process.env.MINIO_ENDPOINT || 'localhost';
-  const port = parseInt(process.env.MINIO_PORT || '9000');
+  const { endpoint, port } = config.get('minio');
 
   const minioClient = new Client({
-    endPoint,
+    endPoint: endpoint,
     port,
     useSSL: false,
     accessKey: 'admin',
