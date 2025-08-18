@@ -11,3 +11,5 @@ minio/
 docker-compose.prod.yml
 docker-prod.sh
 deploy.yml
+docker-compose-my-tests.yml
+docker-compose-my-dev.yml

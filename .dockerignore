@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Development files
+.git/
+.gitignore
+README.md
+.vscode/
+.cursor/
+.DS_Store
+
+# Testing
+coverage/
+.nyc_output/
+
+# Docker files
+docker-compose*.yml
+docker-*.sh
+Dockerfile*
+
+# Environment and config
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# MinIO data
+minio/
+
+# Temporary files
+.zencoder/

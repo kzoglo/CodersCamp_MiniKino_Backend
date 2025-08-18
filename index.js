@@ -38,15 +38,19 @@ app.use('/api/screening', screening);
 app.use('/api/reservation', reservation);
 app.use('/api/login', login);
 
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 app.use((error, req, res, _) => {
   const { statusCode = 500, message, data } = error;
   res.status(statusCode).json({ message, data });
 });
 
-// TODO - to do zmiany bedzie
+// TODO: to do zmiany bedzie
 if (isEqual(process.env.NODE_ENV, 'production')) require('./startup/prod')(app);
 
-const port = process.env.PORT || 3001;
+const port = config.get('port') || 3001;
 
 if (!isEqual(process.env.NODE_ENV, 'testing')) {
   app.listen(port, async () => {

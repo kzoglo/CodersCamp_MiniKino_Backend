@@ -1,8 +1,14 @@
 {
+  "jwtPrivateKey": "testvalue",
+  "port": 3001,
   "db": {
     "dbName": "CC5_Cinema",
     "dbPort": 27017,
     "dbHost": "mongo",
     "password": "example"
+  },
+  "minio": {
+    "endpoint": "minio",
+    "port": 9000
   }
 }

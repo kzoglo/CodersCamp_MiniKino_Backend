@@ -10,14 +10,12 @@ services:
     ports:
       - '3001:3001'
     environment:
-      - NODE_ENV=docker
-      - CINEMA_JWT_PRIVATE_KEY=testvalue
-      - MINIO_ENDPOINT=minio
-      - MINIO_PORT=9000
-      - PORT=3001
+      - NODE_ENV=development
     depends_on:
-      - mongo
-      - minio
+      mongo:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     volumes:
       # For development - enables hot reload
       - .:/app
@@ -25,6 +23,11 @@ services:
     networks:
       - minikino-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001/health']
+      interval: 10s
+      timeout: 5s
+      retries: 2
 
   # MinIO Object Storage
   minio:
@@ -44,17 +47,14 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 2
 
   # MongoDB Database
   mongo:
     image: mongo:7.0.7
     container_name: minikino-mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - '27018:27017' # Keep external port for local access
     volumes:
@@ -64,9 +64,9 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 1
+      retries: 2
     command: ['mongod', '--quiet', '--logpath', '/dev/null']
 
 volumes:

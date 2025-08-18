@@ -10,9 +10,9 @@ services:
       - minikino-test-network
     healthcheck:
       test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 2
     command: ['mongod', '--quiet', '--logpath', '/dev/null']
 
   # MinIO for Testing
@@ -35,7 +35,7 @@ services:
       test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 2
 
   # Test Runner
   test-runner:
@@ -46,10 +46,6 @@ services:
         RUN_ENV: local
     environment:
       - NODE_ENV=testing
-      - CINEMA_JWT_PRIVATE_KEY=testvalue
-      - PORT=3001
-      - MINIO_ENDPOINT=minio-test
-      - MINIO_PORT=9000
       - TEST_FILE=${TEST_FILE}
     depends_on:
       mongo-test:
@@ -59,6 +55,11 @@ services:
     networks:
       - minikino-test-network
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001/health']
+      interval: 10s
+      timeout: 5s
+      retries: 2
     command: sh -c "if [ -n \"$$TEST_FILE\" ] && [ \"$$TEST_FILE\" != \"\" ]; then npm run test:file \"$$TEST_FILE\"; else npm run test; fi"
 
 volumes:
