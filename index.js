@@ -12,6 +12,7 @@ const login = require('./routes/login');
 const { isEqual } = require('./predicates');
 const initializeDatabase = require('./seed/seed');
 const { initializeMinIO } = require('./bucket/minio');
+const { initializeS3 } = require('./bucket/s3');
 
 if (!config.get('jwtPrivateKey')) {
   console.error('ERROR - jwtPrivateKey: Klucz prywatny nie został ustawiony');
@@ -47,7 +48,6 @@ app.use((error, req, res, _) => {
   res.status(statusCode).json({ message, data });
 });
 
-// TODO: to do zmiany bedzie
 if (isEqual(process.env.NODE_ENV, 'production')) require('./startup/prod')(app);
 
 const port = config.get('port') || 3001;
@@ -57,7 +57,13 @@ if (!isEqual(process.env.NODE_ENV, 'testing')) {
     console.log(`Listening on port ${port}...`);
 
     await initializeDatabase();
-    await initializeMinIO();
+    
+    // Use MinIO for local development, S3 for production
+    if (isEqual(process.env.NODE_ENV, 'production')) {
+      await initializeS3();
+    } else {
+      await initializeMinIO();
+    }
   });
 }
 

@@ -34,7 +34,7 @@ const movieSchema = new mongoose.Schema({
     type: String,
     trim: true,
     minlength: 1,
-    maxlength: 100,
+    maxlength: 255,
     required: true,
   },
 });
@@ -49,7 +49,7 @@ function validateMovie(movie) {
     year: Joi.number().min(1895).max(new Date().getFullYear()).required(),
     genre: Joi.string().trim().min(1).max(100).required(),
     description: Joi.string().trim().min(8).max(500).required(),
-    imageUrl: Joi.string().trim().min(1).max(100).required(),
+    imageUrl: Joi.string().trim().min(1).max(255).required(),
   });
 
   return movieJoiSchema.validate(movie);

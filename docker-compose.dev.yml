@@ -4,8 +4,7 @@ services:
     build:
       context: .
       dockerfile: node.Dockerfile
-      args:
-        RUN_ENV: local
+      target: development
     container_name: minikino-app
     ports:
       - '3001:3001'

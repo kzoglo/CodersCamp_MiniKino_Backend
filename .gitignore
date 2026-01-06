@@ -8,8 +8,14 @@ minio/
 .cursor/
 
 # Temporarly ignore prod files
+# TODO: Needs some work
 docker-compose.prod.yml
+# TODO: decide if we need it
 docker-prod.sh
+# TODO: Github Actions workflow - needs some work
 deploy.yml
-docker-compose-my-tests.yml
-docker-compose-my-dev.yml
+docker-prod.sh
+
+# Old docker compose files (kept for reference)
+docker-compose.old.dev.yml
+docker-compose.old.test.yml

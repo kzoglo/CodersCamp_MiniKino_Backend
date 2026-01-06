@@ -1,0 +1,20 @@
+{
+  "jwtPrivateKey": "CINEMA_JWT_PRIVATE_KEY",
+  "port": "PORT",
+  "db": {
+    "dbName": "DB_NAME",
+    "dbPort": "DB_PORT",
+    "dbHost": "DB_HOST",
+    "password": "MONGO_ROOT_PASSWORD",
+    "user": "MONGO_ROOT_USER"
+  },
+  "aws": {
+    "region": "AWS_REGION",
+    "s3": {
+      "backendStorageBucket": "S3_BUCKET_NAME"
+    },
+    "cloudfront": {
+      "domain": "CLOUDFRONT_DOMAIN"
+    }
+  }
+}

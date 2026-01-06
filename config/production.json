@@ -1,0 +1,17 @@
+{
+  "port": 3001,
+  "db": {
+    "dbName": "CC5_Cinema",
+    "dbPort": 27017,
+    "dbHost": "localhost"
+  },
+  "aws": {
+    "region": "us-east-1",
+    "s3": {
+      "backendStorageBucket": "minikino-production-backend-storage"
+    },
+    "cloudfront": {
+      "domain": "placeholder.cloudfront.net"
+    }
+  }
+}
