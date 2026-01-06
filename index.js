@@ -57,7 +57,7 @@ if (!isEqual(process.env.NODE_ENV, 'testing')) {
     console.log(`Listening on port ${port}...`);
 
     await initializeDatabase();
-    
+
     // Use MinIO for local development, S3 for production
     if (isEqual(process.env.NODE_ENV, 'production')) {
       await initializeS3();
