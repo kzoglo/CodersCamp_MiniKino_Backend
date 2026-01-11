@@ -1,8 +1,8 @@
 <h1 align="center">Welcome to CodersCamp_MiniKino_Backend 👋</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.0.8-blue.svg?cacheSeconds=2592000" />
-  <img src="https://img.shields.io/badge/npm-%3E6.0.0-blue.svg" />
-  <img src="https://img.shields.io/badge/node-%3E%3D8.1.0-blue.svg" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2.1.0-blue.svg?cacheSeconds=2592000" />
+  <img src="https://img.shields.io/badge/npm-10.7.0-blue.svg" />
+  <img src="https://img.shields.io/badge/node-20.14.0-blue.svg" />
   <a href="https://github.com/kzoglo/CodersCamp_MiniKino_Backend#readme" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
   </a>
@@ -18,6 +18,16 @@
 > Written in NodeJS REST API for the CodersCamp_MiniKino_Frontend project. It serves user creation, logging system, tickets reservations and admin routes, like movies creation. Server is connected with MongoDB. It uses expressJS and mongoose.
 
 ### 🏠 [Homepage](https://kzoglo.github.io/CodersCamp_MiniKino_Backend)
+
+## Recent Updates
+
+Recent updates (v2.1.0) include:
+- Full Docker containerization with optimized multi-stage builds
+- AWS S3 implementation for file storage
+- GitHub Actions CI/CD workflows
+- Docker Compose setup for development and testing environments
+- Improved dependency management and layer caching
+- Code formatting with Prettier
 
 ## Prerequisites
 
@@ -47,26 +57,16 @@ This starts the full development environment with:
 
 ## Run Tests
 
-### Simple One-Command Testing
-
 ```sh
-npm run test:docker
+npm test
 ```
 
 This automatically builds test containers, runs tests inside Docker, and cleans up.
 
-⚠️ **Don't use `npm test` or `npm run test:file tests-path`** - it doesn't work with the containerized setup
-
-### Test Coverage
-
-```sh
-npm run test-with-coverage
-```
-
 ## Docker Commands
 
 - `npm start` - Start development environment
-- `npm run test:docker` - Run tests (recommended)
+- `npm test` - Run tests in Docker containers
 
 ## Author
 

@@ -18,6 +18,16 @@ EXPOSE 3001
 # Use development start command
 CMD ["npm", "run", "dev"]
 
+# Test stage
+FROM base AS test
+# Install all dependencies (including dev dependencies for testing)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+EXPOSE 3001
+
 # Production stage
 FROM base AS production
 # Install production dependencies only

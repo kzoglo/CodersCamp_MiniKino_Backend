@@ -42,8 +42,7 @@ services:
     build:
       context: .
       dockerfile: node.Dockerfile
-      args:
-        RUN_ENV: local
+      target: test
     environment:
       - NODE_ENV=testing
       - TEST_FILE=${TEST_FILE}
