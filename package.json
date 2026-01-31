@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "bash test-run.sh",
+    "test:container": "cross-env NODE_ENV=testing mocha \"test/**/*.test.js\" --exit",
+    "test:container:file": "cross-env NODE_ENV=testing mocha \"$TEST_FILE\" --exit",
     "start": "bash docker-start.sh",
     "start:prod": "node index.js",
     "format": "prettier --write .",

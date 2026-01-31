@@ -59,7 +59,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 2
-    command: sh -c "if [ -n \"$$TEST_FILE\" ] && [ \"$$TEST_FILE\" != \"\" ]; then npm run test:file \"$$TEST_FILE\"; else npm run test; fi"
+    command: sh -c "if [ -n \"$$TEST_FILE\" ] && [ \"$$TEST_FILE\" != \"\" ]; then npm run test:container:file; else npm run test:container; fi"
 
 volumes:
   mongo-test-data:
