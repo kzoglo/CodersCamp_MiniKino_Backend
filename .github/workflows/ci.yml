@@ -68,7 +68,7 @@ jobs:
           docker compose version
 
       - name: Run Docker-based tests
-        run: npm run test:docker
+        run: npm test
 
   docker-build:
     name: Docker Build Test
