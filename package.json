@@ -1,14 +1,15 @@
 {
   "name": "coderscamp_minikino_backend",
-  "version": "2.0.8",
+  "version": "2.1.0",
   "description": "REST API for cinema tickets reservation.",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env ALLOW_CONFIG_MUTATIONS=true mocha --timeout 2000 --exit 'test/**/*.test.js'",
-    "test:file": "cross-env ALLOW_CONFIG_MUTATIONS=true mocha --timeout 2000 --exit",
-    "test:docker": "bash test-run.sh",
-    "start": "bash docker-start.sh",
+    "test": "bash test-run.sh",
+    "test:container": "cross-env NODE_ENV=testing mocha \"test/**/*.test.js\" --exit",
+    "test:container:file": "cross-env NODE_ENV=testing mocha \"$TEST_FILE\" --exit",
     "dev": "nodemon index.js",
+    "start": "bash docker-start.sh",
+    "start:prod": "node index.js",
     "format": "prettier --write .",
     "format:check": "prettier --check . || true",
     "lint": "eslint .",
@@ -38,6 +39,7 @@
   },
   "homepage": "https://github.com/kzoglo/CodersCamp_MiniKino_Backend#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.700.0",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "config": "^3.2.4",

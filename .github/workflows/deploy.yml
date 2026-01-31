@@ -1,0 +1,96 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  SSM_PREFIX: ${{ vars.SSM_PREFIX }}
+
+jobs:
+  deploy:
+    name: Build and Deploy to AWS
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load deployment params from SSM
+        run: |
+          ECR_REPOSITORY_URL=$(aws ssm get-parameter \
+            --name "${SSM_PREFIX}/ecr-repository-url" \
+            --query "Parameter.Value" \
+            --output text \
+            --region "$AWS_REGION")
+          ECS_CLUSTER_NAME=$(aws ssm get-parameter \
+            --name "${SSM_PREFIX}/ecs-cluster-name" \
+            --query "Parameter.Value" \
+            --output text \
+            --region "$AWS_REGION")
+          ECS_SERVICE_NAME=$(aws ssm get-parameter \
+            --name "${SSM_PREFIX}/ecs-service-name" \
+            --query "Parameter.Value" \
+            --output text \
+            --region "$AWS_REGION")
+          
+          echo "ECR_REPOSITORY_URL=$ECR_REPOSITORY_URL" >> "$GITHUB_ENV"
+          echo "ECS_CLUSTER_NAME=$ECS_CLUSTER_NAME" >> "$GITHUB_ENV"
+          echo "ECS_SERVICE_NAME=$ECS_SERVICE_NAME" >> "$GITHUB_ENV"
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build Docker image for linux/amd64 (production target)
+          docker build \
+            --platform linux/amd64 \
+            -f node.Dockerfile \
+            --target production \
+            -t $ECR_REPOSITORY_URL:latest \
+            -t $ECR_REPOSITORY_URL:$IMAGE_TAG \
+            .
+          
+          # Push both tags to ECR
+          docker push $ECR_REPOSITORY_URL:latest
+          docker push $ECR_REPOSITORY_URL:$IMAGE_TAG
+
+      - name: Deploy to Amazon ECS
+        run: |
+          echo "Forcing ECS service update..."
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER_NAME \
+            --service $ECS_SERVICE_NAME \
+            --force-new-deployment \
+            --region $AWS_REGION
+          
+          echo "✅ Deployment triggered successfully!"
+          echo "Deployment may take 2-3 minutes to complete..."
+
+      - name: Deployment summary
+        run: |
+          echo "### Deployment Summary 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image Tags:** \`latest\`, \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **ECS Cluster:** $ECS_CLUSTER_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "- **ECS Service:** $ECS_SERVICE_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Backend deployment completed successfully!" >> $GITHUB_STEP_SUMMARY
