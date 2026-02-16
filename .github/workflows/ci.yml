@@ -60,8 +60,8 @@ jobs:
         run: |
           # Make sure Docker CLI plugin directory exists
           mkdir -p ~/.docker/cli-plugins/
-          # Download Docker Compose V2
-          curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+          # Download Docker Compose V2 (pinned)
+          curl -SL https://github.com/docker/compose/releases/download/v2.28.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
           # Make it executable
           chmod +x ~/.docker/cli-plugins/docker-compose
           # Verify installation
