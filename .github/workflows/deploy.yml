@@ -1,8 +1,10 @@
 name: Deploy to AWS
 
 on:
-  push:
+  workflow_run:
+    workflows: ['CI Pipeline']
     branches: [develop]
+    types: [completed]
   workflow_dispatch:
 
 env:
@@ -13,7 +15,8 @@ jobs:
   deploy:
     name: Build and Deploy to AWS
     runs-on: ubuntu-latest
-    
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,7 +52,7 @@ jobs:
             --query "Parameter.Value" \
             --output text \
             --region "$AWS_REGION")
-          
+
           echo "ECR_REPOSITORY_URL=$ECR_REPOSITORY_URL" >> "$GITHUB_ENV"
           echo "ECS_CLUSTER_NAME=$ECS_CLUSTER_NAME" >> "$GITHUB_ENV"
           echo "ECS_SERVICE_NAME=$ECS_SERVICE_NAME" >> "$GITHUB_ENV"
@@ -66,20 +69,55 @@ jobs:
             -t $ECR_REPOSITORY_URL:latest \
             -t $ECR_REPOSITORY_URL:$IMAGE_TAG \
             .
-          
+
           # Push both tags to ECR
           docker push $ECR_REPOSITORY_URL:latest
           docker push $ECR_REPOSITORY_URL:$IMAGE_TAG
 
       - name: Deploy to Amazon ECS
         run: |
-          echo "Forcing ECS service update..."
+          echo "Registering new task definition revision..."
+          TASK_DEF_ARN=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER_NAME" \
+            --services "$ECS_SERVICE_NAME" \
+            --query "services[0].taskDefinition" \
+            --output text \
+            --region "$AWS_REGION")
+
+          TASK_DEF_JSON=$(aws ecs describe-task-definition \
+            --task-definition "$TASK_DEF_ARN" \
+            --query "taskDefinition" \
+            --output json \
+            --region "$AWS_REGION")
+
+          NEW_TASK_DEF_JSON=$(echo "$TASK_DEF_JSON" | jq \
+            --arg IMAGE "$ECR_REPOSITORY_URL:$IMAGE_TAG" \
+            'del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy
+            )
+            | .containerDefinitions |= map(
+                if .name == "backend" then .image = $IMAGE else . end
+              )')
+
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json "$NEW_TASK_DEF_JSON" \
+            --query "taskDefinition.taskDefinitionArn" \
+            --output text \
+            --region "$AWS_REGION")
+
+          echo "Deploying new task definition revision..."
           aws ecs update-service \
-            --cluster $ECS_CLUSTER_NAME \
-            --service $ECS_SERVICE_NAME \
-            --force-new-deployment \
-            --region $AWS_REGION
-          
+            --cluster "$ECS_CLUSTER_NAME" \
+            --service "$ECS_SERVICE_NAME" \
+            --task-definition "$NEW_TASK_DEF_ARN" \
+            --region "$AWS_REGION"
+
           echo "✅ Deployment triggered successfully!"
           echo "Deployment may take 2-3 minutes to complete..."
 

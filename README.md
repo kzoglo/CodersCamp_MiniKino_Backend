@@ -22,6 +22,7 @@
 ## Recent Updates
 
 Recent updates (v2.1.0) include:
+
 - Full Docker containerization with optimized multi-stage builds
 - AWS S3 implementation for file storage
 - GitHub Actions CI/CD workflows
@@ -84,7 +85,7 @@ Give a ⭐️ if this project helped you!
 
 ## 📝 License
 
-Copyright © 2020 [Kamil Żogło](https://github.com/kzoglo).<br />
+Copyright © 2020-2026 [Kamil Żogło](https://github.com/kzoglo).<br />
 This project is [MIT](https://github.com/kzoglo/CodersCamp_MiniKino_Backend/blob/master/LICENSE) licensed.
 
 ---
